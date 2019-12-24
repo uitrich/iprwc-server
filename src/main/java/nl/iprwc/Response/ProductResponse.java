@@ -6,24 +6,28 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonView;
 import nl.iprwc.Utils.BaseImageTranslator;
 import nl.iprwc.view.View;
+import org.antlr.stringtemplate.language.Cat;
 import org.joda.time.DateTime;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.List;
 
-public class Product {
+public class ProductResponse {
     //name,price,body_location,category,company,id,image
     private String name;
     private double price;
-    private int body_location;
-    private int category;
-    private int company;
+    private Body_Location body_location;
+    private Category category;
+    private Company company;
     private int id;
     private String image;
 
-    public Product(String name, double price, int body_location, int category, int company, int id, String image) {
+    public ProductResponse(String name, double price, Body_Location body_location, Category category, Company company, int id, String image) {
         this.name = name;
         this.price = price == 0.00 ? 10.00 : price;
         this.body_location = body_location;
@@ -31,6 +35,9 @@ public class Product {
         this.company = company;
         this.id = id;
         this.image = image;
+        try {new URL(image); this.image = BaseImageTranslator.getBase64URL(image);} catch (Exception e) {
+            //ignore
+        }
     }
     @JsonProperty
     public String getImage() {
@@ -49,27 +56,27 @@ public class Product {
         this.id = id;
     }
     @JsonProperty
-    public int getCompany() {
+    public Company getCompany() {
         return company;
     }
 
-    public void setCompany(int company) {
+    public void setCompany(Company company) {
         this.company = company;
     }
     @JsonProperty
-    public int getCategory() {
+    public Category getCategory() {
         return category;
     }
 
-    public void setCategory(int category) {
+    public void setCategory(Category category) {
         this.category = category;
     }
     @JsonProperty
-    public int getBody_location() {
+    public Body_Location getBody_location() {
         return body_location;
     }
 
-    public void setBody_location(int body_location) {
+    public void setBody_location(Body_Location body_location) {
         this.body_location = body_location;
     }
     @JsonProperty

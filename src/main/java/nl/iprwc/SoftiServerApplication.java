@@ -7,6 +7,11 @@ import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
 import nl.iprwc.controller.SuperController;
 import nl.iprwc.resources.*;
+import org.eclipse.jetty.servlets.CrossOriginFilter;
+
+import javax.servlet.DispatcherType;
+import javax.servlet.FilterRegistration;
+import java.util.EnumSet;
 
 
 public class SoftiServerApplication extends Application<SoftiServerConfiguration> {
@@ -45,7 +50,16 @@ public class SoftiServerApplication extends Application<SoftiServerConfiguration
     public void run(final SoftiServerConfiguration configuration,
                     final Environment environment) {
         docciServerConfiguration = configuration;
+        final FilterRegistration.Dynamic cors =
+                environment.servlets().addFilter("CORS", CrossOriginFilter.class);
 
+        // Configure CORS parameters
+        cors.setInitParameter("allowedOrigins", "*");
+        cors.setInitParameter("allowedHeaders", "X-Requested-With,Content-Type,Accept,Origin");
+        cors.setInitParameter("allowedMethods", "OPTIONS,GET,PUT,POST,DELETE,HEAD");
+
+        // Add URL mapping
+        cors.addMappingForUrlPatterns(EnumSet.allOf(DispatcherType.class), true, "/*");
         // Object mapper config
         environment
                 .getObjectMapper()
@@ -54,7 +68,5 @@ public class SoftiServerApplication extends Application<SoftiServerConfiguration
         // Resources
         environment.jersey().register(new AccountResource());
         environment.jersey().register(new ProductResource());
-
-
     }
 }
