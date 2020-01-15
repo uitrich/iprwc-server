@@ -1,13 +1,20 @@
 package nl.iprwc;
 
 import io.dropwizard.Application;
+import io.dropwizard.auth.AuthDynamicFeature;
+import io.dropwizard.auth.AuthValueFactoryProvider;
 import io.dropwizard.configuration.EnvironmentVariableSubstitutor;
 import io.dropwizard.configuration.SubstitutingSourceProvider;
 import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
 import nl.iprwc.controller.SuperController;
+import nl.iprwc.core.AccountAuthorizationFilter;
+import nl.iprwc.core.AddHeaderFilter;
+import nl.iprwc.healtcheck.DatabaseHealthCheck;
+import nl.iprwc.model.User;
 import nl.iprwc.resources.*;
 import org.eclipse.jetty.servlets.CrossOriginFilter;
+import org.glassfish.jersey.server.filter.RolesAllowedDynamicFeature;
 
 import javax.servlet.DispatcherType;
 import javax.servlet.FilterRegistration;
@@ -64,9 +71,25 @@ public class SoftiServerApplication extends Application<SoftiServerConfiguration
         environment
                 .getObjectMapper()
                 .setDateFormat(configuration.getDateTimeFormatter());
+        // Authorization
+        environment.jersey().register(new AuthDynamicFeature(AccountAuthorizationFilter.class));
+        environment.jersey().register(AccountAuthorizationFilter.class);
+        environment.jersey().register(new AuthValueFactoryProvider.Binder<>(User.class));
+        environment.jersey().register(RolesAllowedDynamicFeature.class);
+
+        //Add header filter
+        environment.jersey().register(AddHeaderFilter.class);
+
+        // Health checks
+        environment.healthChecks().register("Database", new DatabaseHealthCheck());
 
         // Resources
         environment.jersey().register(new AccountResource());
         environment.jersey().register(new ProductResource());
+        environment.jersey().register(new AuthenticationResource());
+        environment.jersey().register(new ShoppingCartResource());
+        environment.jersey().register(new CategoryResource());
+        environment.jersey().register(new CompanyResource());
+        environment.jersey().register(new BodyLocationResource());
     }
 }

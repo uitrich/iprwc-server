@@ -1,22 +1,19 @@
 package nl.iprwc.resources;
 
 
-import com.fasterxml.jackson.annotation.JsonView;
-import io.dropwizard.hibernate.UnitOfWork;
-import io.dropwizard.jersey.params.BooleanParam;
+import io.dropwizard.auth.Auth;
 import io.dropwizard.jersey.params.LongParam;
-import io.dropwizard.jersey.params.NonEmptyStringParam;
+import nl.iprwc.controller.GroupController;
 import nl.iprwc.controller.ProductController;
+import nl.iprwc.controller.SuperController;
 import nl.iprwc.model.Product;
-import nl.iprwc.view.View;
+import nl.iprwc.model.User;
 
-import javax.print.attribute.standard.Media;
+import javax.annotation.security.RolesAllowed;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.ws.rs.*;
 import javax.ws.rs.core.*;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
@@ -32,15 +29,17 @@ public class ProductResource {
     private static final Pattern SORT_PATTERN = Pattern.compile(SORT_REGEX, SORT_REGEX_FLAGS);
 
     private final ProductController controller;
+    private GroupController groupController;
 
     public ProductResource() {
-        this.controller = new ProductController();
+        this.controller = SuperController.getInstance().getProductController();
+        this.groupController = SuperController.getInstance().getGroupController();
     }
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public Response getAllProducts(@QueryParam("page")            @DefaultValue("1")  @Min(1) LongParam page,
-                                   @QueryParam("page-size")       @DefaultValue("10") @Min(1) @Max(100) LongParam       pageSize,
+                                   @QueryParam("page-size")       @DefaultValue("12") @Min(1) @Max(100) LongParam       pageSize,
                                    @QueryParam("category")                                              List<Integer> category,
                                    @QueryParam("company")                                               List<Integer> company,
                                    @QueryParam("bodyLocation")                                          List<Integer> bodyLocation,
@@ -63,7 +62,8 @@ public class ProductResource {
     @GET
     @Path("/{id}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getFromId(@PathParam("id") long id) {
+    @RolesAllowed("Role_Admin")
+    public Response getFromId(@PathParam("id") long id, @Auth User user) {
         try {
             Product result = controller.getFromId(id);
             return Response.status(Response.Status.OK).entity(result).build();
@@ -72,13 +72,16 @@ public class ProductResource {
             return Response.status(Response.Status.NOT_FOUND).type(MediaType.APPLICATION_JSON_TYPE).build();
         }
     }
+
     @GET
     @Path("/{id}/image")
+    @RolesAllowed("Role_Admin")
     @Produces("image/png")
     public Response getImageFromId(@PathParam("id") long id) {
         try {
             return Response.status(Response.Status.OK).entity(controller.getImageFromId(id)).build();
         } catch (IOException e) {
+            e.printStackTrace();
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
         }
     }
@@ -94,10 +97,48 @@ public class ProductResource {
         }
     }
 
-    @GET
-    @Path("/{id}/insert")
+    @POST
+    @RolesAllowed("Role_Admin")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response UpdateAuto(@PathParam("id") long id) {
-        return Response.status(Response.Status.OK).entity(controller.update(id)).build();
+    public Response addProduct(Product product) {
+        return Response.status(Response.Status.OK).entity(controller.insertAdd(product)).build();
+    }
+
+    @PUT
+    @RolesAllowed("Role_Admin")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response updateProduct(Product product) {
+        return Response.status(Response.Status.OK).entity(controller.update(product)).build();
+    }
+    @DELETE
+    @Path("/{id}")
+    @RolesAllowed("Role_Admin")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response deleteProduct(@PathParam("id") long id) {
+        return Response.status(Response.Status.OK).entity(controller.delete(id)).build();
+    }
+
+    @GET
+    @RolesAllowed({"Role_Customer", "Role_Admin"})
+    @Path("/categories")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getCategories() {
+        return Response.status(Response.Status.OK).entity(controller.getTypeDesc("category")).build();
+    }
+
+    @GET
+    @RolesAllowed({"Role_Customer", "Role_Admin"})
+    @Path("/companies")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getCompanies() {
+        return Response.status(Response.Status.OK).entity(controller.getTypeDesc("company")).build();
+    }
+
+    @GET
+    @RolesAllowed({"Role_Customer", "Role_Admin"})
+    @Path("/bodylocation")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getBodyLocations() {
+        return Response.status(Response.Status.OK).entity(controller.getTypeDesc("body_location")).build();
     }
 }

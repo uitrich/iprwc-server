@@ -2,6 +2,7 @@ package nl.iprwc.db;
 
 import io.dropwizard.jersey.params.LongParam;
 import javafx.util.Pair;
+import nl.iprwc.Utils.BaseImageTranslator;
 import nl.iprwc.Utils.Paginated;
 import nl.iprwc.model.*;
 import nl.iprwc.model.ProductResponse;
@@ -9,7 +10,10 @@ import nl.iprwc.sql.DatabaseService;
 import nl.iprwc.sql.NamedParameterStatement;
 
 import javax.ws.rs.NotFoundException;
+import javax.ws.rs.Produces;
 import javax.xml.crypto.Data;
+import java.io.IOException;
+import java.net.URL;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.*;
@@ -54,7 +58,6 @@ public class ProductDAO {
                     .createNamedPreparedStatement("SELECT * FROM product WHERE id = :id")
                     .setParameter("id", id)
                     .executeQuery();
-            result.next();
             return fromResultSet(result);
         }
         catch (Exception e) {
@@ -64,32 +67,60 @@ public class ProductDAO {
     }
 
     public Paginated<List<ProductResponse>> getMultiple(long maxPrice, long minPrice, List<Integer> company, List<Integer> categories, List<Integer> bodyLocation, String search, LongParam page, LongParam pageSize) throws SQLException, ClassNotFoundException {
-        String queryContents = "SELECT * FROM Product ";
+        String initialString = "SELECT * FROM Product ";
+        String queryContents = "";
         boolean categoricalSearch = categories.size() > 0 || company.size() > 0 || bodyLocation.size() > 0;
         if (categoricalSearch || search != null) queryContents += "WHERE (";
         for (int i = 0; i < categories.size(); i++) {
             if (i < categories.size() -1) queryContents += "category = :category" + i + " OR ";
-            else queryContents += "category = :category" + i + ") AND (";
+            else queryContents += bodyLocation.size() != 0 && company.size() != 0 ? "category = :category" + i + ") AND (" : "category = :category" + i + ")";
         }
 
         for (int i = 0; i < company.size(); i++) {
+            if (company.get(i) > 46) company.set(i, company.get(i) -1);
             if (i < company.size() -1) queryContents += "company  = :company" + i + " OR ";
-            else queryContents += "company = :company" + i + ") AND (";
+            else queryContents += bodyLocation.size() != 0 && categories.size() != 0 ? "company = :company" + i + ") AND (" : "company = :company" + i + ")";
         }
 
         for (int i = 0; i < bodyLocation.size(); i++) {
             if (i < bodyLocation.size() -1) queryContents += "body_location = :body_location" + i + " OR ";
-            else queryContents += "body_location = :body_location" + i + ") AND (";
+            else queryContents += company.size() != 0 && categories.size() != 0 ? "body_location = :body_location" + i + ") AND (" : "body_location = :body_location" + i + ")";
         }
         queryContents += !(search == null) ? "name LIKE :search) " : " ";
-        queryContents += "LIMIT :pageSize OFFSET :page";
+        String countContent = queryContents;
+        String end = "LIMIT :pagesize OFFSET :page";
         System.out.println(queryContents);
-        NamedParameterStatement query = DatabaseService
+        NamedParameterStatement query = initQuery(initialString, queryContents, end, pageSize, page);
+        query = populatePreparedStatementWithFilters(query, search, categories, company, bodyLocation);
+        List<Product> result = fromResultSets(query.executeQuery());
+
+        NamedParameterStatement counter = initQuery("SELECT COUNT(*) AS count FROM product ", queryContents, "", pageSize, page);
+        counter = populatePreparedStatementWithFilters(counter, search, categories, company, bodyLocation);
+        ResultSet countResult = counter.executeQuery();
+
+        countResult.next();
+        long count = countResult.getLong("count");
+        List<ProductResponse> populatedResult = populateProductList(result);
+        return new Paginated<>(pageSize.get(), page.get(), count, populatedResult);
+
+    }
+
+    private NamedParameterStatement initQuery(String initialString, String queryContents, String end, LongParam pageSize, LongParam page) throws SQLException, ClassNotFoundException {
+        NamedParameterStatement statement =  DatabaseService
                 .getInstance()
-                .createNamedPreparedStatement(queryContents)
-                .setParameter("pageSize", pageSize.get())
-                .setParameter("page", (page.get() -1) * pageSize.get());
-        if (search != null) query.setParameter("search", "%" + search + "%");
+                .createNamedPreparedStatement(initialString + queryContents + end);
+        long getPagesize = pageSize.get();
+        if (getPagesize != 0 && end != "") {
+
+                statement
+                    .setParameter("pagesize", getPagesize)
+                    .setParameter("page", (page.get() -1) * pageSize.get());
+        }
+        return statement;
+    }
+
+    private NamedParameterStatement populatePreparedStatementWithFilters(NamedParameterStatement query, String search, List<Integer> categories, List<Integer> company, List<Integer> bodyLocation) throws SQLException {
+        if (search != null) { query.setParameter("search", "%" + search + "%");}
         for (int i = 0; i < categories.size(); i++) {
             query.setParameter("category"+i, categories.get(i));
         }
@@ -99,14 +130,7 @@ public class ProductDAO {
         for (int i = 0; i < bodyLocation.size(); i++) {
             query.setParameter("body_location"+i, bodyLocation.get(i));
         }
-        List<Product> result = fromResultSets(query.executeQuery());
-        
-        ResultSet counter = DatabaseService.getInstance().createPreparedStatement("SELECT COUNT(*) as results FROM product ").executeQuery();
-        counter.next();
-        long count = counter.getLong("results");
-        List<ProductResponse> populatedResult = populateProductList(result);
-        return new Paginated<>(pageSize.get(), page.get(), count, populatedResult);
-
+        return query;
     }
 
     public String getImage(long id) {
@@ -122,10 +146,31 @@ public class ProductDAO {
         return "";
     }
 
-    public boolean update(long id) {
+    public boolean update(Product product) {
+        product = product.compare(getSingle(product.getId()));
         try {
-            DatabaseService.getInstance().createNamedPreparedStatement("INSERT INTO product_stats (product_id) VALUES (:id)")
-            .setParameter("id", id).executeUpdate();
+            new URL(product.getImage());
+            product.setImage(BaseImageTranslator.getBase64URL(product.getImage()));
+        } catch (Exception ignore) {};
+        try {
+            //name,price,body_location,category,company,id,image
+            int resultkey = DatabaseService.getInstance().createNamedPreparedStatement(
+                    "UPDATE product " +
+                            "SET name =:name, " +
+                            "price = :price, " +
+                            "category = :category, " +
+                            "body_location = :body_location, " +
+                            "company = :company, " +
+                            "image = :image" +
+                            "WHERE id = :id")
+                    .setParameter("name", product.getName())
+                    .setParameter("price", product.getPrice())
+                    .setParameter("category", product.getCategory())
+                    .setParameter("body_location", product.getBody_location())
+                    .setParameter("company", product.getCompany())
+                    .setParameter("image", product.getImage())
+                    .setParameter("id", product.getId())
+                    .executeUpdate();
             return true;
         } catch (SQLException | ClassNotFoundException e) {
             e.printStackTrace();
@@ -136,7 +181,10 @@ public class ProductDAO {
     public List<ProductResponse> getTop(long range) throws NotFoundException {
         try {
             ResultSet top = DatabaseService.getInstance().createNamedPreparedStatement(
-                    "SELECT product.name, product.price, product.body_location, product.category, product.company, product.id, product.image FROM product, product_stats JOIN product p on id=product_id ORDER BY views LIMIT :range OFFSET 0 "
+                    "SELECT " +
+                            "product.name, product.price, product.body_location, product.category, product.company, product.id, product.image " +
+                            "FROM product, product_stats " +
+                            "JOIN product p on id=product_id ORDER BY views LIMIT :range OFFSET 0 "
             )
                     .setParameter("range", range)
                     .executeQuery();
@@ -146,7 +194,7 @@ public class ProductDAO {
             throw new NotFoundException();
         }
     }
-    private List<ProductResponse> populateProductList(List<Product> products) {
+    public List<ProductResponse> populateProductList(List<Product> products) {
         List<ProductResponse> result = new ArrayList<>();
         for (Product product : products) {
             result.add(
@@ -200,6 +248,51 @@ public class ProductDAO {
         } catch (Exception e) {
             e.printStackTrace();
             return null;
+        }
+    }
+
+    public Product insert(Product product) {
+        try {new URL(product.getImage()); product.setImage(BaseImageTranslator.getBase64URL(product.getImage()));} catch (Exception ignore) {}
+        try {
+            DatabaseService.getInstance()
+                    .createNamedPreparedStatement("INSERT INTO product VALUES(:name, :price, :body_location, :image, :category, :company)")
+                    .setParameter("name", product.getName())
+                    .setParameter("price", product.getPrice())
+                    .setParameter("body_location", product.getBody_location())
+                    .setParameter("image", product.getBody_location())
+                    .setParameter("category", product.getCategory())
+                    .setParameter("company", product.getCompany())
+            .execute();
+        } catch (SQLException | ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+        return product;
+    }
+
+    public List<Category> getTypeDesc(String type) {
+        List<Category> categoryResult = new ArrayList<>();
+        try {
+            ResultSet queryResult = DatabaseService.getInstance()
+                    .createPreparedStatement("SELECT * FROM" + type)
+            .executeQuery();
+            while (queryResult.next()) {
+                categoryResult.add(new Category(queryResult.getLong("id"), queryResult.getString("name")));
+            }
+            return categoryResult;
+        } catch (SQLException | ClassNotFoundException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public boolean delete(long id) {
+        try {
+            return DatabaseService.getInstance().createNamedPreparedStatement("DELETE FROM product WHERE id = :id")
+                    .setParameter("id", id)
+                    .execute();
+        } catch (SQLException | ClassNotFoundException e) {
+            e.printStackTrace();
+            return false;
         }
     }
 }

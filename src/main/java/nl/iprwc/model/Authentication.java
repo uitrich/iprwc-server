@@ -2,15 +2,15 @@ package nl.iprwc.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class Authenticate {
+public class Authentication {
     @JsonProperty
-    private String username;
+    private String mailAddress;
 
     @JsonProperty
     private String password;
 
-    public String getUsername() {
-        return username;
+    public String getMailAddress() {
+        return mailAddress;
     }
 
     public String getPassword() {

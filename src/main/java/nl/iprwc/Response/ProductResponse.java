@@ -35,7 +35,7 @@ public class ProductResponse {
         this.company = company;
         this.id = id;
         this.image = image;
-        try {new URL(image); this.image = BaseImageTranslator.getBase64URL(image);} catch (Exception e) {
+        try {new URL(image); this.image = "data:image/jpg;base64," + BaseImageTranslator.getBase64URL(image);} catch (Exception e) {
             //ignore
         }
     }
