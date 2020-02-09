@@ -43,13 +43,12 @@ public class AccountController {
     }
 
     public Account create(Account account) throws InvalidDataException, SQLException, NotFoundException, ClassNotFoundException  {
-
             List<FormError> list = account.isValid();
             account.setPasswordHash(new BCrypt().hash(account.getPasswordHash()));
 
-            if(list.size() > 0){
-                throw new InvalidDataException(list.toString());
-            }
+//            if(list.size() > 0){
+//                throw new InvalidDataException(list.toString());
+//            }
 
             long generatedKey = dao.create(account);
 
@@ -79,5 +78,9 @@ public class AccountController {
         shoppingCartController.delete(account);
         groupController.deleteAccountGroup(account);
         return dao.delete(account);
+    }
+
+    public List<Account> getAll() throws SQLException, ClassNotFoundException {
+        return dao.getAll();
     }
 }

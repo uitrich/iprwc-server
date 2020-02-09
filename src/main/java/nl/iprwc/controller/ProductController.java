@@ -4,13 +4,10 @@ import io.dropwizard.jersey.params.LongParam;
 import nl.iprwc.Utils.BaseImageTranslator;
 import nl.iprwc.Utils.Paginated;
 import nl.iprwc.db.ProductDAO;
-import nl.iprwc.model.Category;
-import nl.iprwc.model.Group;
 import nl.iprwc.model.Product;
 import nl.iprwc.model.ProductResponse;
 
 import javax.ws.rs.NotFoundException;
-import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -60,7 +57,8 @@ public class ProductController {
         return dao.populateProductList(input);
     }
 
-    public Product insertAdd(Product product) {
+    public Product insertAdd(ProductResponse input) {
+        Product product = splitResponse(input);
         String image = product.getImage();
         boolean isUrl = false;
         try {
@@ -68,7 +66,11 @@ public class ProductController {
             product.setImage(BaseImageTranslator.getBase64URL(image));
         } catch (IOException ignored) {
         }
-        return dao.insert(product);
+        if (product.getCategory() == 0 ) System.out.println("category has 0, aborting..");
+        else if (product.getCompany() == 0 ) System.out.println("company has 0, aborting..");
+        else if (product.getBody_location() == 0 ) { System.out.println("body location has 0, aborting.."); }
+        else return dao.insert(product);
+        return null;
     }
 
     public Object getTypeDesc(String type) {
@@ -77,5 +79,17 @@ public class ProductController {
 
     public boolean delete(long id) {
         return dao.delete(id);
+    }
+
+    public Product splitResponse(ProductResponse product) {
+        long catId = SuperController.getInstance().getCategoryController().createIfNotExists(product.getCategory());
+        long comId = SuperController.getInstance().getCompanyController().createIfNotExists(product.getCompany());
+        long bodId = SuperController.getInstance().getBodyLocationController().createIfNotExists(product.getBody_location());
+
+        return new Product(product.getName(), product.getPrice(), bodId, catId, comId, product.getId(), product.getImage());
+    }
+
+    public List<ProductResponse> getAllIndestinctive() throws SQLException, ClassNotFoundException {
+        return dao.getAll();
     }
 }

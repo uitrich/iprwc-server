@@ -24,12 +24,12 @@ public class Product {
     private int id;
     private String image;
 
-    public Product(String name, double price, int body_location, int category, int company, int id, String image) {
+    public Product(String name, double price, long body_location, long category, long company, int id, String image) {
         this.name = name;
         this.price = price == 0.00 ? 10.00 : price;
-        this.body_location = body_location;
-        this.category = category;
-        this.company = company;
+        this.body_location = Math.toIntExact(body_location);
+        this.category = Math.toIntExact(category);
+        this.company = Math.toIntExact(company);
         this.id = id;
         this.image = image;
     }
@@ -43,7 +43,7 @@ public class Product {
     }
     @JsonProperty
     public String getImage() {
-        return image;
+        return this.image;
     }
     @JsonIgnore
     public void setImage(String image) {

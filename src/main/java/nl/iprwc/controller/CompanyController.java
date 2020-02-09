@@ -21,11 +21,24 @@ public class CompanyController {
         return dao.update(id, name);
     }
 
-    public boolean post(String name) {
+    public long post(String name) {
         return dao.post(name);
     }
 
     public boolean delete(long id) {
         return dao.delete(id);
+    }
+
+    public long createIfNotExists(Company company) {
+        int id = exists(company.getName());
+        if (id == 0) {
+            dao.post(company.getName());
+            id = exists(company.getName());
+        }
+        return id;
+    }
+
+    private int exists(String name) {
+        return dao.exists(name);
     }
 }

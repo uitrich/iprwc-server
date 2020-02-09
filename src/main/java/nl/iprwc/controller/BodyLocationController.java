@@ -20,11 +20,24 @@ public class BodyLocationController {
         return dao.update(id, name);
     }
 
-    public boolean post(String name) {
+    public long post(String name) {
         return dao.post(name);
     }
 
     public boolean delete(long id) {
         return dao.delete(id);
+    }
+
+    public long createIfNotExists(Body_Location body_location) {
+        int id = exists(body_location.getName());
+        if (id == 0) {
+            dao.post(body_location.getName());
+            id = exists(body_location.getName());
+        }
+        return id;
+    }
+
+    private int exists(String name) {
+        return dao.exists(name);
     }
 }

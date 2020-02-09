@@ -5,12 +5,15 @@ import nl.iprwc.groups.GroupService;
 import nl.iprwc.model.Account;
 import nl.iprwc.model.Authentication;
 import nl.iprwc.model.Group;
+import nl.iprwc.model.ProductResponse;
 import nl.iprwc.sql.DatabaseService;
 import nl.iprwc.sql.NamedParameterStatement;
 
 import javax.ws.rs.NotFoundException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class AccountDAO {
     public AccountDAO() {
@@ -88,7 +91,7 @@ public class AccountDAO {
         statement.setString("house_number", account.getHouse_number());
         statement.setString("password", account.getPasswordHash());
         statement.setString("reference", account.getReference());
-        statement.setString("mailaddress", account.getMailAddress());
+        statement.setString("mailaddres s", account.getMailAddress());
 
 
         if(statement.executeUpdate() == 0){
@@ -221,5 +224,21 @@ public class AccountDAO {
             e.printStackTrace();
             return false;
         }
+    }
+
+    public List<Account> getAll() throws SQLException, ClassNotFoundException {
+        ResultSet res = DatabaseService.getInstance().createPreparedStatement("SELECT * FROM account")
+                .executeQuery();
+        List<Account> result = new ArrayList<>();
+        while (res.next()) {
+            result.add(new Account(
+                    res.getString("firstname"),
+                    res.getString("lastname"),
+                    res.getString("mailaddress"),
+                    res.getString("postal_code"),
+                    res.getString("house_number")
+            ));
+        }
+        return result;
     }
 }

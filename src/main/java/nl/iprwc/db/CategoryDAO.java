@@ -4,6 +4,7 @@ import nl.iprwc.exception.NotFoundException;
 import nl.iprwc.model.Category;
 import nl.iprwc.sql.DatabaseService;
 
+import javax.xml.crypto.Data;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -43,15 +44,32 @@ public class CategoryDAO {
         }
     }
 
-    public boolean post(String name) {
+    public long post(String name) {
         try {
-            return DatabaseService.getInstance()
-                    .createNamedPreparedStatement("INSERT INTO Category VALUES (:name)")
+            boolean result = !DatabaseService.getInstance()
+                    .createNamedPreparedStatement("INSERT INTO category (name) VALUES (:name)")
                     .setParameter("name", name)
-                    .execute();
+                    .executeQuery().getString("id").equals("");
+            if (result) return getByName(name);
         } catch (Exception e) {
             e.printStackTrace();
-            return false;
+        }
+        return 0;
+    }
+
+    private long getByName(String name) {
+        try {ResultSet result = DatabaseService.getInstance()
+                .createNamedPreparedStatement("SELECT * FROM category WHERE name = :name")
+                .setParameter("name", name)
+                .executeQuery();
+            if (result.next()) {
+                return result.getLong("id");
+            }
+            System.out.println("cant find " + name + " in database");
+            return 0;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return 0;
         }
     }
 
@@ -78,6 +96,19 @@ public class CategoryDAO {
             e.printStackTrace();
             return false;
         }
+    }
+
+    public int exists(String name) {
+        try {
+            ResultSet res = DatabaseService.getInstance()
+                    .createNamedPreparedStatement("SELECT * FROM category WHERE name = :name")
+                    .setParameter("name", name)
+                    .executeQuery();
+            if (res.next()) return res.getInt("id");
+        } catch (SQLException | ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+        return 0;
     }
 }
 

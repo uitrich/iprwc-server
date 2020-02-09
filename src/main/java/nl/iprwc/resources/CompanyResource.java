@@ -65,11 +65,4 @@ public class CompanyResource {
     public Response update(@PathParam("id") long id, String name) {
         return Response.status(Response.Status.OK).entity(controller.update(id, name)).build();
     }
-
-    @Produces(MediaType.APPLICATION_JSON)
-    @Path("/{id}")
-    @RolesAllowed("Role_Admin")
-    public Response update(@PathParam("id") long id, String name) {
-        return Response.status(Response.Status.OK).entity(controller.update(id, name))
-    }
 }

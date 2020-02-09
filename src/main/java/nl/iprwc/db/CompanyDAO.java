@@ -42,15 +42,17 @@ public class CompanyDAO {
         }
     }
 
-    public boolean post(String name) {
+
+    public long post(String name) {
         try {
+
             return DatabaseService.getInstance()
-                    .createNamedPreparedStatement("INSERT INTO company VALUES (:name)")
+                    .createNamedPreparedStatement("INSERT INTO company (name) VALUES (:name)")
                     .setParameter("name", name)
-                    .execute();
+                    .executeUpdate();
         } catch (Exception e) {
             e.printStackTrace();
-            return false;
+            return 0;
         }
     }
 
@@ -77,6 +79,19 @@ public class CompanyDAO {
             e.printStackTrace();
             return false;
         }
+    }
+
+    public int exists(String name) {
+        try {
+            ResultSet res = DatabaseService.getInstance()
+                    .createNamedPreparedStatement("SELECT * FROM company WHERE name = :name")
+                    .setParameter("name", name)
+                    .executeQuery();
+            if (res.next()) return res.getInt("id");
+        } catch (SQLException | ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+        return 0;
     }
 }
 

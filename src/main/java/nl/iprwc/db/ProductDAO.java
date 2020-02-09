@@ -66,7 +66,7 @@ public class ProductDAO {
         return null;
     }
 
-    public Paginated<List<ProductResponse>> getMultiple(long maxPrice, long minPrice, List<Integer> company, List<Integer> categories, List<Integer> bodyLocation, String search, LongParam page, LongParam pageSize) throws SQLException, ClassNotFoundException {
+    public Paginated<List<ProductResponse>>     getMultiple(long maxPrice, long minPrice, List<Integer> company, List<Integer> categories, List<Integer> bodyLocation, String search, LongParam page, LongParam pageSize) throws SQLException, ClassNotFoundException {
         String initialString = "SELECT * FROM Product ";
         String queryContents = "";
         boolean categoricalSearch = categories.size() > 0 || company.size() > 0 || bodyLocation.size() > 0;
@@ -88,7 +88,7 @@ public class ProductDAO {
         }
         queryContents += !(search == null) ? "name LIKE :search) " : " ";
         String countContent = queryContents;
-        String end = "LIMIT :pagesize OFFSET :page";
+        String end = "ORDER BY id LIMIT :pagesize OFFSET :page";
         System.out.println(queryContents);
         NamedParameterStatement query = initQuery(initialString, queryContents, end, pageSize, page);
         query = populatePreparedStatementWithFilters(query, search, categories, company, bodyLocation);
@@ -111,7 +111,6 @@ public class ProductDAO {
                 .createNamedPreparedStatement(initialString + queryContents + end);
         long getPagesize = pageSize.get();
         if (getPagesize != 0 && end != "") {
-
                 statement
                     .setParameter("pagesize", getPagesize)
                     .setParameter("page", (page.get() -1) * pageSize.get());
@@ -147,30 +146,34 @@ public class ProductDAO {
     }
 
     public boolean update(Product product) {
-        product = product.compare(getSingle(product.getId()));
         try {
             new URL(product.getImage());
             product.setImage(BaseImageTranslator.getBase64URL(product.getImage()));
         } catch (Exception ignore) {};
         try {
+            String image = product.getImage();
+            String id = String.valueOf(product.getId());
+            id = id.replace("\nRETURNING", "");
             //name,price,body_location,category,company,id,image
-            int resultkey = DatabaseService.getInstance().createNamedPreparedStatement(
+            NamedParameterStatement resultkey = DatabaseService.getInstance().createNamedPreparedStatement(
                     "UPDATE product " +
-                            "SET name =:name, " +
+                            "SET name = :name, " +
+                            "id = :id, " +
                             "price = :price, " +
                             "category = :category, " +
                             "body_location = :body_location, " +
                             "company = :company, " +
-                            "image = :image" +
+                            "image = :image " +
                             "WHERE id = :id")
+                    .setInt("id", Integer.parseInt(id))
                     .setParameter("name", product.getName())
                     .setParameter("price", product.getPrice())
                     .setParameter("category", product.getCategory())
                     .setParameter("body_location", product.getBody_location())
                     .setParameter("company", product.getCompany())
-                    .setParameter("image", product.getImage())
-                    .setParameter("id", product.getId())
-                    .executeUpdate();
+                    .setParameter("image", image);
+            System.out.println(resultkey.getStatement());
+            resultkey.execute();
             return true;
         } catch (SQLException | ClassNotFoundException e) {
             e.printStackTrace();
@@ -214,11 +217,16 @@ public class ProductDAO {
     private Category getCategory(int catId) {
         try {
             ResultSet categoryResult = DatabaseService.getInstance()
-                    .createNamedPreparedStatement("SELECT * FROM Category WHERE id = :id")
+                    .createNamedPreparedStatement("SELECT * FROM category WHERE id = :id")
                     .setParameter("id", catId)
                     .executeQuery();
-            categoryResult.next();
-            return new Category(catId, categoryResult.getString("name"));
+            if (categoryResult.next()) {
+                return new Category(catId, categoryResult.getString("name"));
+            }
+            else {
+                System.out.println(catId + ", cannot be found");
+                return new Category(catId, "empty");
+            }
         } catch (Exception e) {
             e.printStackTrace();
             return null;
@@ -227,7 +235,7 @@ public class ProductDAO {
     private Company getCompany(int companyId) {
         try {
             ResultSet companyResult = DatabaseService.getInstance()
-                    .createNamedPreparedStatement("SELECT * FROM Company WHERE id = :id")
+                    .createNamedPreparedStatement("SELECT * FROM company WHERE id = :id")
                     .setParameter("id", companyId)
                     .executeQuery();
             companyResult.next();
@@ -240,7 +248,7 @@ public class ProductDAO {
     private Body_Location getBody_Location(int companyId) {
         try {
             ResultSet bodyLocationResult = DatabaseService.getInstance()
-                    .createNamedPreparedStatement("SELECT * FROM Category WHERE id = :id")
+                    .createNamedPreparedStatement("SELECT * FROM body_location WHERE id = :id")
                     .setParameter("id", companyId)
                     .executeQuery();
             bodyLocationResult.next();
@@ -255,7 +263,7 @@ public class ProductDAO {
         try {new URL(product.getImage()); product.setImage(BaseImageTranslator.getBase64URL(product.getImage()));} catch (Exception ignore) {}
         try {
             DatabaseService.getInstance()
-                    .createNamedPreparedStatement("INSERT INTO product VALUES(:name, :price, :body_location, :image, :category, :company)")
+                    .createNamedPreparedStatement("INSERT INTO product (name, price, body_location, image, category, company) VALUES(:name, :price, :body_location, :image, :category, :company)")
                     .setParameter("name", product.getName())
                     .setParameter("price", product.getPrice())
                     .setParameter("body_location", product.getBody_location())
@@ -287,6 +295,7 @@ public class ProductDAO {
 
     public boolean delete(long id) {
         try {
+            DatabaseService.getInstance().createNamedPreparedStatement("DELETE FROM product_stats WHERE product_id = :id").setParameter("id", id).execute();
             return DatabaseService.getInstance().createNamedPreparedStatement("DELETE FROM product WHERE id = :id")
                     .setParameter("id", id)
                     .execute();
@@ -294,6 +303,25 @@ public class ProductDAO {
             e.printStackTrace();
             return false;
         }
+    }
+
+    public List<ProductResponse> getAll() throws SQLException, ClassNotFoundException {
+        ResultSet res = DatabaseService.getInstance().createPreparedStatement("SELECT * FROM product")
+                .executeQuery();
+        List<Product> productResponse = new ArrayList<>();
+        while (res.next()) {
+            productResponse.add(new Product(
+                    res.getString("name"),
+                    res.getDouble("price"),
+                    res.getLong("body_location"),
+                    res.getLong("category"),
+                    res.getLong("company"),
+                    res.getInt("id"),
+                    res.getString("image")
+            )
+            );
+        }
+        return populateProductList(productResponse);
     }
 }
 

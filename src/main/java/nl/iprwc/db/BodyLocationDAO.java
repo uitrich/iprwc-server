@@ -43,15 +43,17 @@ public class BodyLocationDAO {
         }
     }
 
-    public boolean post(String name) {
+    public long post(String name) {
         try {
-            return DatabaseService.getInstance()
-                    .createNamedPreparedStatement("INSERT INTO body_location VALUES (:name)")
+            ResultSet results = DatabaseService.getInstance()
+                    .createNamedPreparedStatement("INSERT INTO body_location (name) VALUES (:name)")
                     .setParameter("name", name)
-            .execute();
+            .executeQuery();
+            results.next();
+            return results.getLong("id");
         } catch (Exception e) {
             e.printStackTrace();
-            return false;
+            return 0;
         }
     }
 
@@ -78,6 +80,19 @@ public class BodyLocationDAO {
             e.printStackTrace();
             return false;
         }
+    }
+
+    public int exists(String name) {
+        try {
+            ResultSet resultSet =  DatabaseService.getInstance()
+                    .createNamedPreparedStatement("SELECT * FROM body_location WHERE name = :name")
+                    .setParameter("name", name)
+                    .executeQuery();
+            if (resultSet.next()) return resultSet.getInt("id");
+        } catch (SQLException | ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+        return 0;
     }
 }
 

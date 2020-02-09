@@ -52,6 +52,14 @@ public class Account {
         this.house_number = house_number;
     }
 
+    public Account(String firstName, String lastName, String mailAddress, String postal_code, String house_number) {
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.mailAddress = mailAddress.toLowerCase();
+        this.postal_code = postal_code;
+        this.house_number = house_number;
+    }
+
     public Account(String firstName, String lastName, String mailAddress, String passwordHash) {
         this.id = id;
         this.firstName = firstName;
@@ -238,7 +246,7 @@ public class Account {
         this.mailAddress = mailAddress.toLowerCase();
     }
 
-    @JsonIgnore
+    @JsonProperty
     public String getPasswordHash() {
         return passwordHash;
     }

@@ -36,6 +36,21 @@ public class AccountResource {
             return Response.status(Response.Status.NOT_FOUND).type(MediaType.APPLICATION_JSON_TYPE).build();
         }
     }
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @Path("/admin")
+    @RolesAllowed("Role_Admin")
+    public Response getAccounts(@Auth User user) {
+        try {
+            return Response.status(Response.Status.OK).entity(controller.getAll()).build();
+        } catch (NotFoundException e) {
+            return Response.status(Response.Status.NOT_FOUND).type(MediaType.APPLICATION_JSON_TYPE).build();
+        } catch (SQLException e) {
+            return Response.status(Response.Status.CONFLICT).build();
+        } catch (ClassNotFoundException e) {
+            return Response.status(Response.Status.BAD_REQUEST).build();
+        }
+    }
 
     @GET
     @Path("/admin/{id}")

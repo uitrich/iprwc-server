@@ -1,12 +1,14 @@
 package nl.iprwc.resources;
 
 
+import com.google.gson.Gson;
 import io.dropwizard.auth.Auth;
 import io.dropwizard.jersey.params.LongParam;
 import nl.iprwc.controller.GroupController;
 import nl.iprwc.controller.ProductController;
 import nl.iprwc.controller.SuperController;
 import nl.iprwc.model.Product;
+import nl.iprwc.model.ProductResponse;
 import nl.iprwc.model.User;
 
 import javax.annotation.security.RolesAllowed;
@@ -47,6 +49,24 @@ public class ProductResource {
     ) {
         try {
             return Response.status(Response.Status.OK).entity(controller.getAll(page, pageSize, search, category, company, bodyLocation)).build();
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return Response.status(Response.Status.BAD_REQUEST).build();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+            return Response.status(Response.Status.NOT_FOUND).build();
+        } catch ( Exception e) {
+            e.printStackTrace();
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+    @GET
+    @Path("/admin")
+    @RolesAllowed("Role_Admin")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getAllProducts() {
+        try {
+            return Response.status(Response.Status.OK).entity(controller.getAllIndestinctive()).build();
         } catch (SQLException e) {
             e.printStackTrace();
             return Response.status(Response.Status.BAD_REQUEST).build();
@@ -100,16 +120,23 @@ public class ProductResource {
     @POST
     @RolesAllowed("Role_Admin")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response addProduct(Product product) {
+    public Response addProduct(String json) {
+        System.out.println(json);
+        Gson gson = new Gson();
+        ProductResponse product = gson.fromJson(json, ProductResponse.class);
         return Response.status(Response.Status.OK).entity(controller.insertAdd(product)).build();
     }
 
     @PUT
     @RolesAllowed("Role_Admin")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response updateProduct(Product product) {
-        return Response.status(Response.Status.OK).entity(controller.update(product)).build();
+    public Response updateProduct(String json) {
+        System.out.println(json);
+        Gson gson = new Gson();
+        ProductResponse product = gson.fromJson(json, ProductResponse.class);
+        return Response.status(Response.Status.OK).entity(controller.update(controller.splitResponse(product))).build();
     }
+
     @DELETE
     @Path("/{id}")
     @RolesAllowed("Role_Admin")

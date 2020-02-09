@@ -9,6 +9,11 @@ import java.util.List;
 
 public class CategoryController {
     CategoryDAO dao = new CategoryDAO();
+
+    public int exists(String name) {
+        return dao.exists(name);
+    }
+
     public List<Category> getAll() {
         return dao.getAll();
     }
@@ -21,11 +26,20 @@ public class CategoryController {
         return dao.update(id, name);
     }
 
-    public boolean post(String name) {
+    public long post(String name) {
         return dao.post(name);
     }
 
     public boolean delete(long id) {
         return dao.delete(id);
+    }
+
+    public long createIfNotExists(Category category) {
+        int id = exists(category.getName());
+        if ( id == 0) {
+            dao.post(category.getName());
+            id = exists(category.getName());
+        }
+        return id;
     }
 }
