@@ -179,24 +179,25 @@ public class AccountDAO {
     }
 
     public Account updateAccount(Account account) {
+        account = replaceNull(account);
         try {
             NamedParameterStatement statement = DatabaseService.getInstance()
                     .createNamedPreparedStatement(
-                            "UPDATE account SET id = :id," +
+                            "UPDATE account SET" +
                                     " mailaddress = :mailaddress," +
                                     " password = :password," +
                                     " firstname = :firstname," +
                                     " lastname = :lastname," +
                                     " postal_code = :postalCode," +
-                                    " house_number = :houseNumber," +
-                                    " reference = :reference")
-                    .setParameter("id", account.getId())
+                                    " house_number = :house_number " +
+                                    "WHERE id = :id")
                     .setParameter("mailaddress", account.getMailAddress())
                     .setParameter("password", account.getPasswordHash())
                     .setParameter("firstname", account.getFirstName())
                     .setParameter("lastname", account.getLastName())
-                    .setParameter("postal_code", account.getPostal_code())
-                    .setParameter("house_number", account.getHouse_number());
+                    .setParameter("postalCode", account.getPostal_code())
+                    .setParameter("house_number", account.getHouse_number())
+                    .setParameter("id", account.getId());
             if(statement.executeUpdate() == 0){
                 throw new NotFoundException();
             }
@@ -240,5 +241,15 @@ public class AccountDAO {
             ));
         }
         return result;
+    }
+
+    private Account replaceNull(Account account) {
+        Account currentAccount = getAccountFromMail(account.getMailAddress());
+        currentAccount.setMailAddress(account.getMailAddress());
+        currentAccount.setFirstName(account.getFirstName());
+        currentAccount.setLastName(account.getLastName());
+        currentAccount.setPostal_code(account.getPostal_code());
+        currentAccount.setHouse_number(account.getHouse_number());
+        return currentAccount;
     }
 }

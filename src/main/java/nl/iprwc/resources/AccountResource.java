@@ -2,6 +2,8 @@ package nl.iprwc.resources;
 
 
 import com.fasterxml.jackson.annotation.JsonView;
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 import com.sun.media.sound.InvalidDataException;
 import io.dropwizard.auth.Auth;
 import nl.iprwc.controller.AccountController;
@@ -106,8 +108,9 @@ public class AccountResource {
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     @RolesAllowed("Role_Admin")
-    public Response updateAccount(Account account) {
-        return Response.status(Response.Status.OK).entity(controller.updateAccount(account)).build();
+    public Response updateAccount(String gsonInput) {
+        JsonObject json = new Gson().fromJson(gsonInput, JsonObject.class);
+        return Response.status(Response.Status.OK).entity(controller.updateAccount(fromObject(json))).build();
     }
 
     @DELETE
@@ -126,5 +129,15 @@ public class AccountResource {
     @RolesAllowed("Role_Admin")
     public Response deleteAccount(@PathParam("id") long account) {
         return Response.status(Response.Status.OK).entity(controller.deleteAccount(account)).build();
+    }
+
+    private Account fromObject(JsonObject in) {
+        return new Account(
+                in.get("firstName").getAsString(),
+                in.get("lastName").getAsString(),
+                in.get("mailAddress").getAsString(),
+                in.get("postal_code").getAsString(),
+                in.get("house_number").getAsString()
+        );
     }
 }
