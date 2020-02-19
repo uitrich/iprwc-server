@@ -1,7 +1,6 @@
 package nl.iprwc.db;
 
 import io.dropwizard.jersey.params.LongParam;
-import javafx.util.Pair;
 import nl.iprwc.Utils.BaseImageTranslator;
 import nl.iprwc.Utils.Paginated;
 import nl.iprwc.model.*;
