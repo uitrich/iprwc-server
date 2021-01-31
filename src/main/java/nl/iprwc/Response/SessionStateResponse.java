@@ -6,7 +6,7 @@ import org.joda.time.DateTime;
 public class SessionStateResponse {
     private boolean valid;
     private DateTime lastActivity = null;
-    private long accountId;
+    private String accountId;
 
     public SessionStateResponse(Session session) {
         this(!session.isExpired(), session.getLastActivity(), session.getAccount().getId());
@@ -16,7 +16,7 @@ public class SessionStateResponse {
         this.valid = valid;
     }
 
-    public SessionStateResponse(boolean valid, DateTime lastActivity, long accountId) {
+    public SessionStateResponse(boolean valid, DateTime lastActivity, String accountId) {
         this.valid = valid;
         this.lastActivity = lastActivity;
         this.accountId = accountId;
@@ -30,7 +30,7 @@ public class SessionStateResponse {
         return lastActivity;
     }
 
-    public long getAccountId() {
+    public String getAccountId() {
         return accountId;
     }
 }

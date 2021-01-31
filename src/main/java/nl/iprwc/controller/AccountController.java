@@ -13,6 +13,7 @@ import nl.iprwc.sql.DatabaseService;
 import javax.ws.rs.InternalServerErrorException;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.UUID;
 
 public class AccountController {
     private final AccountDAO dao;
@@ -27,7 +28,7 @@ public class AccountController {
         groupController = superController.getGroupController();
     }
 
-    public Account getFromId(long id) {
+    public Account getFromId(String id) {
         return dao.getFromId(id);
     }
     public Account tryLogin(Authentication auth) throws SQLException, ClassNotFoundException {
@@ -44,26 +45,22 @@ public class AccountController {
 
     public Account create(Account account) throws InvalidDataException, SQLException, NotFoundException, ClassNotFoundException  {
             List<FormError> list = account.isValid();
+            if (list.size() > 0) throw new InvalidDataException("This account is invalid");
             account.setPasswordHash(new BCrypt().hash(account.getPasswordHash()));
 
-//            if(list.size() > 0){
-//                throw new InvalidDataException(list.toString());
-//            }
-
-            long generatedKey = dao.create(account);
+            String generatedKey = dao.create(account);
 
             Account generatedAccount;
-            if(generatedKey != 0){
+            if(generatedKey != null){
                 generatedAccount = getFromId(generatedKey);
 
                 long groupId = 1;
-                String internalReferference = null;
-                internalReferference = GroupService.getInstance().fromRawId(groupId).getInternalReference();
+                String internalReference = null;
+                internalReference = GroupService.getInstance().fromRawId(groupId).getInternalReference();
 
-                if(dao.addGroupToAccount(generatedAccount, internalReferference)){
+                if(dao.addGroupToAccount(generatedAccount, internalReference)){
                     return getFromId(generatedAccount.getId());
                 }
-
             }else{
                 throw new InternalServerErrorException("Something went wrong creating the account");
             }
@@ -73,8 +70,11 @@ public class AccountController {
     public Account updateAccount(Account account){
         return dao.updateAccount(account);
     }
+    public void UpdateAccountId(String oldId) throws SQLException, ClassNotFoundException {
+        dao.UpdateId(oldId, UUID.randomUUID().toString());
+    }
 
-    public boolean deleteAccount(long account) {
+    public boolean deleteAccount(String account) {
         shoppingCartController.delete(account);
         groupController.deleteAccountGroup(account);
         return dao.delete(account);

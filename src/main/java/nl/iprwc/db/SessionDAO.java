@@ -32,7 +32,7 @@ public class SessionDAO {
 
             return new Session(
                     id,
-                    accountController.getFromId(result.getLong("account_id")),
+                    accountController.getFromId(result.getString("account_id")),
                     result.getString("session_key"),
                     JodaDateTime.fromTimestamp(result.getTimestamp("last_activity")));
         }
@@ -64,7 +64,7 @@ public class SessionDAO {
 
             return new Session(
                     result.getLong("id"),
-                    accountController.getFromId(result.getLong("account_id")),
+                    accountController.getFromId(result.getString("account_id")),
                     key,
                     plainKey,
                     JodaDateTime.fromTimestamp(result.getTimestamp("last_activity")));
@@ -102,7 +102,7 @@ public class SessionDAO {
         }
     }
 
-    public long create(long accountId, String sessionHash, DateTime lastActivity)
+    public long create(String accountId, String sessionHash, DateTime lastActivity)
     {
         NamedParameterStatement statement = null;
         try {

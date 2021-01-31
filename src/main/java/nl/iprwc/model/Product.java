@@ -21,10 +21,10 @@ public class Product {
     private int body_location;
     private int category;
     private int company;
-    private int id;
+    private long id;
     private String image;
 
-    public Product(String name, double price, long body_location, long category, long company, int id, String image) {
+    public Product(String name, double price, long body_location, long category, long company, long id, String image) {
         this.name = name;
         this.price = price == 0.00 ? 10.00 : price;
         this.body_location = Math.toIntExact(body_location);
@@ -50,11 +50,11 @@ public class Product {
         this.image = image;
     }
     @JsonProperty
-    public int getId() {
+    public long getId() {
         return id;
     }
     @JsonIgnore
-    public void setId(int id) {
+    public void setId(long id) {
         this.id = id;
     }
     @JsonProperty

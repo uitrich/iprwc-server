@@ -8,16 +8,13 @@ import nl.iprwc.view.View;
 
 import javax.persistence.Entity;
 import javax.persistence.Table;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 @Entity
 @Table(name = "account")
 public class Account {
 
-    private long id;
+    private String id;
     private String mailAddress;
     private String passwordHash;
     private String firstName;
@@ -28,7 +25,7 @@ public class Account {
     private String reference;
 
     public Account() {
-        this.id = 0;
+        this.id = UUID.randomUUID().toString();
         this.firstName = null;
         this.lastName = null;
         this.mailAddress = null;
@@ -39,7 +36,7 @@ public class Account {
         this.reference = "";
     }
 
-    public Account(long id, String firstName, String lastName, String mailAddress, String postal_code, String house_number, String passwordHash, String reference) {
+    public Account(String id, String firstName, String lastName, String mailAddress, String postal_code, String house_number, String passwordHash, String reference) {
 
         this.id = id;
         this.firstName = firstName;
@@ -177,17 +174,6 @@ public class Account {
         return this;
     }
 
-    /**
-     * Function to compare. id's used for sorting.
-     * @param compareAccount
-     * @return
-     */
-    public int compareTo(Account compareAccount){
-        if(this.getId() > compareAccount.getId()) return 1;
-        if(this.getId() < compareAccount.getId()) return -1;
-        else return 0;
-    }
-
     public void setGroups(Group[] groups){
         this.groups = new ArrayList<>(Arrays.asList(groups));
     }
@@ -205,12 +191,12 @@ public class Account {
 
     @JsonProperty
     @JsonView(View.Public.class)
-    public long getId() {
+    public String getId() {
         return id;
     }
 
     @JsonIgnore
-    public void setId(long id) {
+    public void setId(String id) {
         this.id = id;
     }
 

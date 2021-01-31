@@ -29,6 +29,7 @@ public class ProductResource {
     private static final String SORT_REGEX = "^(asc|desc)\\-(.+)$";
     private static final int SORT_REGEX_FLAGS = Pattern.CASE_INSENSITIVE;
     private static final Pattern SORT_PATTERN = Pattern.compile(SORT_REGEX, SORT_REGEX_FLAGS);
+    private static Gson gson;
 
     private final ProductController controller;
     private GroupController groupController;
@@ -36,6 +37,7 @@ public class ProductResource {
     public ProductResource() {
         this.controller = SuperController.getInstance().getProductController();
         this.groupController = SuperController.getInstance().getGroupController();
+        gson = new Gson();
     }
 
     @GET
@@ -121,8 +123,6 @@ public class ProductResource {
     @RolesAllowed("Role_Admin")
     @Produces(MediaType.APPLICATION_JSON)
     public Response addProduct(String json) {
-        System.out.println(json);
-        Gson gson = new Gson();
         ProductResponse product = gson.fromJson(json, ProductResponse.class);
         return Response.status(Response.Status.OK).entity(controller.insertAdd(product)).build();
     }
@@ -131,8 +131,6 @@ public class ProductResource {
     @RolesAllowed("Role_Admin")
     @Produces(MediaType.APPLICATION_JSON)
     public Response updateProduct(String json) {
-        System.out.println(json);
-        Gson gson = new Gson();
         ProductResponse product = gson.fromJson(json, ProductResponse.class);
         return Response.status(Response.Status.OK).entity(controller.update(controller.splitResponse(product))).build();
     }
@@ -146,7 +144,7 @@ public class ProductResource {
     }
 
     @GET
-    @RolesAllowed({"Role_Customer", "Role_Admin"})
+    @RolesAllowed({"Role_Customer"})
     @Path("/categories")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getCategories() {
@@ -154,7 +152,7 @@ public class ProductResource {
     }
 
     @GET
-    @RolesAllowed({"Role_Customer", "Role_Admin"})
+    @RolesAllowed({"Role_Customer"})
     @Path("/companies")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getCompanies() {
@@ -162,7 +160,7 @@ public class ProductResource {
     }
 
     @GET
-    @RolesAllowed({"Role_Customer", "Role_Admin"})
+    @RolesAllowed({"Role_Customer"})
     @Path("/bodylocation")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getBodyLocations() {

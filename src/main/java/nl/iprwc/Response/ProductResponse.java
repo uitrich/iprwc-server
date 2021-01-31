@@ -24,10 +24,10 @@ public class ProductResponse {
     private Body_Location body_location;
     private Category category;
     private Company company;
-    private int id;
+    private long id;
     private String image;
 
-    public ProductResponse(String name, double price, Body_Location body_location, Category category, Company company, int id, String image) {
+    public ProductResponse(String name, double price, Body_Location body_location, Category category, Company company, long id, String image) {
         this.name = name;
         this.price = price == 0.00 ? 10.00 : price;
         this.body_location = body_location;
@@ -48,11 +48,11 @@ public class ProductResponse {
         this.image = image;
     }
     @JsonProperty
-    public int getId() {
+    public long getId() {
         return id;
     }
     @JsonIgnore
-    public void setId(int id) {
+    public void setId(long id) {
         this.id = id;
     }
     @JsonProperty

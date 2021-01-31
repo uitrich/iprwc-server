@@ -322,5 +322,19 @@ public class ProductDAO {
         }
         return populateProductList(productResponse);
     }
+
+    public void addView(long productId) throws SQLException, ClassNotFoundException {
+        DatabaseService.getInstance().createPreparedStatement(
+            "UPDATE product SET " +
+            "name = :name, " +
+            "id = :id, " +
+            "price = :price, " +
+            "category = :category, " +
+            "body_location = :body_location, " +
+            "company = :company, " +
+            "image = :image " +
+            "WHERE product_id = :productId"
+        );
+    }
 }
 

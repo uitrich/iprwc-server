@@ -15,7 +15,7 @@ public class ShoppingCartController {
     ShoppingCartController() {
         dao = new ShoppingCartDAO();
     }
-    public List<ProductResponse> addItem(long id, long user) {
+    public List<ProductResponse> addItem(long id, String user) {
         if (!dao.isItemAlreadyIn(id, user)) {
             return dao.AddToCart( user, id);
         }
@@ -25,23 +25,23 @@ public class ShoppingCartController {
     public List<ProductResponse> getShoppingcart(User user) {
      return dao.getShoppingCartContents(user.getAccount().getId());
     }
-    public List<ProductResponse> getShoppingcart(long user) {
+    public List<ProductResponse> getShoppingcart(String user) {
         return dao.getShoppingCartContents(user);
     }
 
-    public List<ProductResponse> deleteItem(long id, long user) {
+    public List<ProductResponse> deleteItem(long id, String user) {
         return dao.deleteItem(id, user);
     }
 
-    public long updateQuantity(long productid, long amount, long id) {
+    public long updateQuantity(long productid, long amount, String id) {
         return dao.updateQuantity(productid, amount, id);
     }
 
-    public List<List<Long>> getQuantity(long id) {
+    public List<List<Long>> getQuantity(String id) {
         return dao.getQuantities(id);
     }
 
-    public boolean delete(long id) {
+    public boolean delete(String id) {
         try {
             return DatabaseService.getInstance()
                     .createNamedPreparedStatement("DELETE FROM shoppingcart WHERE account_id = :id")

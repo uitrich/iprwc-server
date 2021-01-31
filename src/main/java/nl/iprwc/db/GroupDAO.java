@@ -8,7 +8,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public class GroupDAO {
-    public boolean deleteAccountGroup(long id) {
+    public boolean deleteAccountGroup(String id) {
         try {
             return DatabaseService.getInstance()
                     .createNamedPreparedStatement("DELETE FROM account_group_member WHERE account_id = :id")

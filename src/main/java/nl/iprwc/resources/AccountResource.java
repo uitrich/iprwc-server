@@ -18,6 +18,7 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.sql.SQLException;
+import java.util.UUID;
 
 @Path("/api/account")
 @Produces(MediaType.APPLICATION_JSON)
@@ -58,7 +59,7 @@ public class AccountResource {
     @Path("/admin/{id}")
     @Produces(MediaType.APPLICATION_JSON)
     @RolesAllowed("Role_Admin")
-    public Response getAccount(@PathParam("id") long personId) {
+    public Response getAccount(@PathParam("id") String personId) {
         try {
             return Response.status(Response.Status.OK).entity(controller.getFromId(personId)).build();
         } catch (NotFoundException e) {
@@ -127,8 +128,17 @@ public class AccountResource {
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     @RolesAllowed("Role_Admin")
-    public Response deleteAccount(@PathParam("id") long account) {
+    public Response deleteAccount(@PathParam("id") String account) {
         return Response.status(Response.Status.OK).entity(controller.deleteAccount(account)).build();
+    }
+
+    @GET
+    @Path("/reset/users")
+    public Response resetUserIds() throws SQLException, ClassNotFoundException {
+        for (Account account : controller.getAll()) {
+            controller.UpdateAccountId(account.getId());
+        }
+        return Response.status(Response.Status.OK).build();
     }
 
     private Account fromObject(JsonObject in) {
@@ -140,4 +150,5 @@ public class AccountResource {
                 in.get("house_number").getAsString()
         );
     }
+
 }

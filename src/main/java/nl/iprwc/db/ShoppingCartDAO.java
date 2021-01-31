@@ -14,7 +14,7 @@ import java.util.List;
 
 public class ShoppingCartDAO {
     ProductController productController = SuperController.getInstance().getProductController();
-    public List<ProductResponse> AddToCart(long accountId, long productId) {
+    public List<ProductResponse> AddToCart(String accountId, long productId) {
         try {
             boolean result = DatabaseService.getInstance()
                     .createNamedPreparedStatement("INSERT INTO shopping_cart (account_id, product_id) VALUES (:account_id, :product_id)")
@@ -31,7 +31,7 @@ public class ShoppingCartDAO {
         }
     }
 
-    public List<ProductResponse> getShoppingCartContents(long accountId) {
+    public List<ProductResponse> getShoppingCartContents(String accountId) {
         List<Product> results = new ArrayList<>();
         try {
             ResultSet result = DatabaseService.getInstance().createNamedPreparedStatement("SELECT * FROM shopping_cart WHERE account_id = :id")
@@ -48,7 +48,7 @@ public class ShoppingCartDAO {
         }
     }
 
-    public List<ProductResponse> deleteItem(long id, long user) {
+    public List<ProductResponse> deleteItem(long id, String user) {
         try {
             DatabaseService.getInstance().createNamedPreparedStatement("DELETE FROM shopping_cart WHERE product_id = :id AND account_id = :userId" )
                     .setParameter("id", id)
@@ -62,7 +62,7 @@ public class ShoppingCartDAO {
         return getShoppingCartContents(user);
     }
 
-    public List<List<Long>> addQuantity(long productid, long id) {
+    public List<List<Long>> addQuantity(long productid, String id) {
         try {
             DatabaseService.getInstance()
                     .createNamedPreparedStatement("UPDATE shopping_cart SET quantity = quantity +1 WHERE account_id = :id AND product_id = :productid")
@@ -76,7 +76,7 @@ public class ShoppingCartDAO {
         }
     }
 
-    public long updateQuantity(long productid, long amount, long id) {
+    public long updateQuantity(long productid, long amount, String id) {
         try {
             DatabaseService.getInstance()
                     .createNamedPreparedStatement("UPDATE shopping_cart SET quantity = :amount WHERE account_id = :id AND product_id = :productid")
@@ -90,7 +90,7 @@ public class ShoppingCartDAO {
             return 0;
         }
     }
-    public List<List<Long>> getQuantities(long accountId) {
+    public List<List<Long>> getQuantities(String accountId) {
         try {
             ResultSet results = DatabaseService.getInstance().createNamedPreparedStatement("SELECT * FROM shopping_cart WHERE account_id = :id")
                     .setParameter("id", accountId)
@@ -110,7 +110,7 @@ public class ShoppingCartDAO {
         }
     }
 
-    public boolean isItemAlreadyIn(long id, long userId) {
+    public boolean isItemAlreadyIn(long id, String userId) {
         try {
             ResultSet results = DatabaseService.getInstance()
                     .createNamedPreparedStatement("SELECT id FROM shopping_cart " +
@@ -124,7 +124,7 @@ public class ShoppingCartDAO {
             return false;
         }
     }
-    private long getItemQuantity(long accountId, long productId) {
+    private long getItemQuantity(String accountId, long productId) {
         try {
             ResultSet resultSet = DatabaseService.getInstance()
                     .createNamedPreparedStatement("SELECT quantity FROM shopping_cart " +

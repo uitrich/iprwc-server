@@ -47,7 +47,7 @@ public class SessionController {
         String sessionHash;
         long id;
         Sha512 sha512 = new Sha512();
-        long accountId = account.getId();
+        String accountId = account.getId();
         DateTime lastActivity = DateTime.now();
 
         do {

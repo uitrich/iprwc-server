@@ -40,7 +40,7 @@ public class ShoppingCartResource {
     @Path("/admin/{id}")
     @RolesAllowed("Role_Admin")
     @JsonView(View.Public.class)
-    public Response getCartContents(@PathParam("id") long accountId) {
+    public Response getCartContents(@PathParam("id") String accountId) {
         return Response.status(Response.Status.OK).entity(controller.getShoppingcart(accountId)).build();
     }
 
@@ -56,7 +56,7 @@ public class ShoppingCartResource {
     @Path("/admin/{id}/{user}")
     @JsonView(View.Public.class)
     @RolesAllowed("Role_Admin")
-    public Response addCartItem(@PathParam("id") long id, @PathParam("user") long user) {
+    public Response addCartItem(@PathParam("id") long id, @PathParam("user") String user) {
         return Response.status(Response.Status.OK).entity(controller.addItem(id, user)).build();
     }
 
@@ -77,7 +77,7 @@ public class ShoppingCartResource {
     @DELETE
     @RolesAllowed("Role_Admin")
     @Path("/admin/{userId}/{id}")
-    public Response deleteCartItem(@PathParam("id") long id, @PathParam("userId") long user) {
+    public Response deleteCartItem(@PathParam("id") long id, @PathParam("userId") String user) {
         return Response.status(Response.Status.OK).entity(controller.deleteItem(id, user)).build();
     }
 
@@ -91,7 +91,7 @@ public class ShoppingCartResource {
     @POST
     @RolesAllowed("Role_Admin")
     @Path("/admin/updatequantity/{id}/{amount}")
-    public Response updateQuantity(@PathParam("id") long productid, @Auth User auth,@PathParam("amount") long amount, long user) {
+    public Response updateQuantity(@PathParam("id") long productid, @Auth User auth,@PathParam("amount") long amount, String user) {
         return Response.status(Response.Status.OK).entity(controller.updateQuantity(productid, amount, user)).build();
     }
 
@@ -103,7 +103,9 @@ public class ShoppingCartResource {
     }
     @POST
     @Path("/admin/quantity/{id}")
-    public Response getQuantity(@Auth User auth, long userId) {
-        return Response.status(Response.Status.OK).entity(controller.getQuantity(userId)).build();
+    public Response getQuantity(@Auth User auth, String userId) {
+        if (auth.getAccount().getId() == userId || auth.hasGroupReference("Role_Admin"))
+            return Response.status(Response.Status.OK).entity(controller.getQuantity(userId)).build();
+        throw new NotAuthorizedException("You do not have permission to alter another user's account");
     }
 }

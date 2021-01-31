@@ -8,12 +8,14 @@ import nl.iprwc.model.Group;
 import nl.iprwc.model.ProductResponse;
 import nl.iprwc.sql.DatabaseService;
 import nl.iprwc.sql.NamedParameterStatement;
+import org.hibernate.id.GUIDGenerator;
 
 import javax.ws.rs.NotFoundException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 public class AccountDAO {
     public AccountDAO() {
@@ -25,7 +27,7 @@ public class AccountDAO {
         if(result.next()){
             account = new
                     Account(
-                    result.getLong("id"),
+                    result.getString("id"),
                     result.getString("firstname"),
                     result.getString("lastname"),
                     result.getString("mailaddress"),
@@ -40,7 +42,7 @@ public class AccountDAO {
         return null;
     }
 
-    public Account getFromId(long id) {
+    public Account getFromId(String id) {
         try {
             return
             fromResultSet(DatabaseService.getInstance()
@@ -79,12 +81,12 @@ public class AccountDAO {
         }
     }
 
-    public long create(Account account) throws SQLException, ClassNotFoundException {
+    public String create(Account account) throws SQLException, ClassNotFoundException {
         NamedParameterStatement statement = DatabaseService.getInstance()
                 .createNamedPreparedStatement("INSERT INTO public.account "
-                + "(firstname, lastname, mailaddress, password, postal_code, house_number, reference) VALUES "
-                + "(:firstname, :lastname, :mailaddress, :password, :postal_code, :house_number, :reference);");
-
+                + "(id, firstname, lastname, mailaddress, password, postal_code, house_number, reference) VALUES "
+                + "(:id, :firstname, :lastname, :mailaddress, :password, :postal_code, :house_number, :reference);");
+        statement.setString("id", UUID.randomUUID().toString());
         statement.setString("firstname", account.getFirstName());
         statement.setString("lastname", account.getLastName());
         statement.setString("postal_code", account.getPostal_code());
@@ -95,15 +97,15 @@ public class AccountDAO {
 
 
         if(statement.executeUpdate() == 0){
-            return 0;
+            return null;
         }
         ResultSet keys = statement.getGeneratedKeys();
 
 
         if(keys.next()){
-            return keys.getLong("id");
+            return keys.getString("id");
         }else{
-            return 0;
+            return null;
         }
 
 
@@ -131,7 +133,7 @@ public class AccountDAO {
 
     public boolean addGroupToAccount(Account account, String groupName) throws SQLException, ClassNotFoundException {
         Group group = getGroupIdByName(groupName);
-        if(getFromId(account.getId()).getId() != 0 && account.getId() != 0 && !accountMemberRelationExists(account.getId(), group.getId())) {
+        if(getFromId(account.getId()).getId() != null && account.getId() != null && !accountMemberRelationExists(account.getId(), group.getId())) {
             NamedParameterStatement statement = DatabaseService.getInstance().createNamedPreparedStatement("INSERT INTO account_group_member (account_id, group_id) " +
                     "VALUES (:accountId, :groupId)");
             statement.setParameter("accountId", account.getId());
@@ -147,7 +149,7 @@ public class AccountDAO {
         }
     }
 
-    private boolean accountMemberRelationExists(long accountId, long groupId) throws SQLException, ClassNotFoundException {
+    private boolean accountMemberRelationExists(String accountId, long groupId) throws SQLException, ClassNotFoundException {
         NamedParameterStatement statement = DatabaseService
                 .getInstance()
                 .createNamedPreparedStatement("SELECT * FROM account_group_member WHERE account_id = :accountId AND group_id = :groupId")
@@ -215,7 +217,7 @@ public class AccountDAO {
         }
     }
 
-    public boolean delete(long account) {
+    public boolean delete(String account) {
         try {
             return DatabaseService.getInstance()
                     .createNamedPreparedStatement("DELETE FROM account WHERE id = :id")
@@ -232,15 +234,27 @@ public class AccountDAO {
                 .executeQuery();
         List<Account> result = new ArrayList<>();
         while (res.next()) {
-            result.add(new Account(
-                    res.getString("firstname"),
-                    res.getString("lastname"),
-                    res.getString("mailaddress"),
-                    res.getString("postal_code"),
-                    res.getString("house_number")
-            ));
+
+            Account account = new Account(
+                res.getString("firstname"),
+                res.getString("lastname"),
+                res.getString("mailaddress"),
+                res.getString("postal_code"),
+                res.getString("house_number")
+            );
+            account.setId(res.getString("id"));
+            result.add(account);
         }
         return result;
+    }
+    public void UpdateId(String oldId, String newId) throws SQLException, ClassNotFoundException {
+        DatabaseService.getInstance().createNamedPreparedStatement(
+                "UPDATE account SET" +
+                " id = :newId " +
+                        "WHERE id = :oldId")
+                .setParameter("newId", newId)
+                .setParameter("oldId", oldId)
+                .executeUpdate();
     }
 
     private Account replaceNull(Account account) {

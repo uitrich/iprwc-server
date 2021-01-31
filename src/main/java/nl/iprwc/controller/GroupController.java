@@ -9,7 +9,7 @@ public class GroupController {
         dao = new GroupDAO();
     }
 
-    public boolean deleteAccountGroup(long id) {
+    public boolean deleteAccountGroup(String id) {
         return dao.deleteAccountGroup(id);
     }
 }

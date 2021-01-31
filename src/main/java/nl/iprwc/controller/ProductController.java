@@ -92,4 +92,5 @@ public class ProductController {
     public List<ProductResponse> getAllIndestinctive() throws SQLException, ClassNotFoundException {
         return dao.getAll();
     }
+
 }
