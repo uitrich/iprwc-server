@@ -10,9 +10,16 @@ import java.sql.SQLException;
 import java.util.List;
 
 public class ShoppingCartController {
-    ShoppingCartDAO dao;
+    private ShoppingCartDAO dao;
+    private static ShoppingCartController instance;
+    public static synchronized ShoppingCartController getInstance() {
+        if (instance == null) {
+            instance = new ShoppingCartController();
+        }
 
-    ShoppingCartController() {
+        return instance;
+    }
+    private ShoppingCartController() {
         dao = new ShoppingCartDAO();
     }
     public List<ProductResponse> addItem(long id, String user) {

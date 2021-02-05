@@ -3,8 +3,8 @@ package nl.iprwc.db;
 
 import nl.iprwc.Utils.JodaDateTime;
 import nl.iprwc.controller.AccountController;
-import nl.iprwc.controller.SuperController;
 import nl.iprwc.exception.NotFoundException;
+import nl.iprwc.model.Account;
 import nl.iprwc.model.Session;
 import nl.iprwc.sql.DatabaseService;
 import nl.iprwc.sql.NamedParameterStatement;
@@ -28,11 +28,9 @@ public class SessionDAO {
                 throw new NotFoundException();
             }
 
-            AccountController accountController = SuperController.getInstance().getAccountController();
-
             return new Session(
                     id,
-                    accountController.getFromId(result.getString("account_id")),
+                    AccountController.getInstance().getFromId(result.getString("account_id")),
                     result.getString("session_key"),
                     JodaDateTime.fromTimestamp(result.getTimestamp("last_activity")));
         }
@@ -60,11 +58,10 @@ public class SessionDAO {
                 throw new NotFoundException();
             }
 
-            AccountController accountController = SuperController.getInstance().getAccountController();
 
             return new Session(
                     result.getLong("id"),
-                    accountController.getFromId(result.getString("account_id")),
+                    AccountController.getInstance().getFromId(result.getString("account_id")),
                     key,
                     plainKey,
                     JodaDateTime.fromTimestamp(result.getTimestamp("last_activity")));
@@ -125,5 +122,14 @@ public class SessionDAO {
             e.printStackTrace();
         }
         return -1;
+    }
+
+    public boolean hasSession(Account account) throws SQLException, ClassNotFoundException {
+        ResultSet resultSet = DatabaseService.getInstance()
+                .createNamedPreparedStatement("SELECT * FROM session WHERE account_id = :id")
+                .setParameter("id", account.getId())
+                .executeQuery();
+
+        return resultSet.next();
     }
 }

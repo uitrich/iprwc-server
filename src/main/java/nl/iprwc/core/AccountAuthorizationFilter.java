@@ -1,7 +1,6 @@
 package nl.iprwc.core;
 
 import nl.iprwc.controller.SessionController;
-import nl.iprwc.controller.SuperController;
 import nl.iprwc.controller.UserController;
 import nl.iprwc.exception.NotFoundException;
 import nl.iprwc.model.Session;
@@ -20,13 +19,9 @@ import java.io.IOException;
 @PreMatching
 @Priority(Priorities.AUTHORIZATION)
 public class AccountAuthorizationFilter implements ContainerRequestFilter {
-    private SessionController sessionController;
-    private UserController userController;
 
     public AccountAuthorizationFilter()
     {
-        sessionController = SuperController.getInstance().getSessionController();
-        userController = SuperController.getInstance().getUserController();
     }
 
     @Override
@@ -35,15 +30,15 @@ public class AccountAuthorizationFilter implements ContainerRequestFilter {
             String sessionKey = requestContext.getCookies().get("session-key").getValue();
 
             try {
-                Session session = sessionController.fromSessionKey(sessionKey);
+                Session session = SessionController.getInstance().fromSessionKey(sessionKey);
 
                 if (session.isExpired()) {
-                    sessionController.delete(session);
+                    SessionController.getInstance().delete(session);
                 }
 
-                sessionController.updateLastActivity(session);
+                SessionController.getInstance().updateLastActivity(session);
 
-                User user = userController.fromAccount(session.getAccount());
+                User user = UserController.getInstance().fromAccount(session.getAccount());
                 String scheme = requestContext.getUriInfo().getRequestUri().getScheme();
                 SecurityContext securityContext = new AccountSecurityContext(user, scheme);
                 requestContext.setSecurityContext(securityContext);
@@ -54,7 +49,7 @@ public class AccountAuthorizationFilter implements ContainerRequestFilter {
             }
         }
 
-        User user = userController.getAnonymousUser();
+        User user = UserController.getInstance().getAnonymousUser();
         String scheme = requestContext.getUriInfo().getRequestUri().getScheme();
         SecurityContext securityContext = new AccountSecurityContext(user, scheme);
         requestContext.setSecurityContext(securityContext);

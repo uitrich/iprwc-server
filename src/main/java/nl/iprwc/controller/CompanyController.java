@@ -8,7 +8,19 @@ import nl.iprwc.model.Company;
 import java.util.List;
 
 public class CompanyController {
-    CompanyDAO dao = new CompanyDAO();
+    private CompanyDAO dao;
+    private static CompanyController instance;
+
+    public static synchronized CompanyController getInstance() {
+        if (instance == null) {
+            instance = new CompanyController();
+        }
+
+        return instance;
+    }
+    private CompanyController() {
+        dao = new CompanyDAO();
+    }
     public List<Company> getAll() {
         return dao.getAll();
     }

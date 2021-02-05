@@ -1,14 +1,12 @@
 package nl.iprwc.controller;
 
 import com.sun.media.sound.InvalidDataException;
-import io.dropwizard.auth.Auth;
-import nl.iprwc.Utils.Validator;
+import nl.iprwc.Request.AccountRequest;
 import nl.iprwc.db.AccountDAO;
 import nl.iprwc.exception.NotFoundException;
 import nl.iprwc.groups.GroupService;
 import nl.iprwc.hash.BCrypt;
 import nl.iprwc.model.*;
-import nl.iprwc.sql.DatabaseService;
 
 import javax.ws.rs.InternalServerErrorException;
 import java.sql.SQLException;
@@ -17,15 +15,16 @@ import java.util.UUID;
 
 public class AccountController {
     private final AccountDAO dao;
-    private final SuperController superController;
-    private final GroupController groupController;
-    private final ShoppingCartController shoppingCartController;
+    private static AccountController instance;
+    public static synchronized AccountController getInstance() {
+        if (instance == null) {
+            instance = new AccountController();
+        }
 
+        return instance;
+    }
     public AccountController() {
         dao = new AccountDAO();
-        superController = SuperController.getInstance();
-        shoppingCartController = superController.getShoppingCartController();
-        groupController = superController.getGroupController();
     }
 
     public Account getFromId(String id) {
@@ -43,10 +42,8 @@ public class AccountController {
         return dao.getAccountFromMail(mailAddress);
     }
 
-    public Account create(Account account) throws InvalidDataException, SQLException, NotFoundException, ClassNotFoundException  {
-            List<FormError> list = account.isValid();
-            if (list.size() > 0) throw new InvalidDataException("This account is invalid");
-            account.setPasswordHash(new BCrypt().hash(account.getPasswordHash()));
+    public Account create(AccountRequest account) throws InvalidDataException, SQLException, NotFoundException, ClassNotFoundException  {
+            account.setPassword(new BCrypt().hash(account.getPassword()));
 
             String generatedKey = dao.create(account);
 
@@ -75,8 +72,8 @@ public class AccountController {
     }
 
     public boolean deleteAccount(String account) {
-        shoppingCartController.delete(account);
-        groupController.deleteAccountGroup(account);
+        ShoppingCartController.getInstance().delete(account);
+        GroupController.getInstance().deleteAccountGroup(account);
         return dao.delete(account);
     }
 

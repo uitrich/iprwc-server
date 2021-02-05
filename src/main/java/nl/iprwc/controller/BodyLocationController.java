@@ -7,6 +7,23 @@ import nl.iprwc.model.Body_Location;
 import java.util.List;
 
 public class BodyLocationController {
+    private static BodyLocationController instance;
+
+    /**
+     * Create a singleton from supercontroller, this controller has access to all other controller and can be called from anywhere.
+     * @return
+     */
+    public static synchronized BodyLocationController getInstance() {
+        if (instance == null) {
+            instance = new BodyLocationController();
+        }
+
+        return instance;
+    }
+    private BodyLocationController() {
+        dao = new BodyLocationDAO();
+    }
+
     BodyLocationDAO dao = new BodyLocationDAO();
     public List<Body_Location> getAll() {
         return dao.getAll();

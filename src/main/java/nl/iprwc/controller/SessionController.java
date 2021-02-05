@@ -9,11 +9,20 @@ import nl.iprwc.model.Session;
 import org.hibernate.exception.ConstraintViolationException;
 import org.joda.time.DateTime;
 
+import java.sql.SQLException;
+
 public class SessionController {
     private SessionDAO dao;
+    private static SessionController instance;
 
-    public SessionController()
-    {
+    public static synchronized SessionController getInstance() {
+        if (instance == null) {
+            instance = new SessionController();
+        }
+
+        return instance;
+    }
+    private SessionController() {
         dao = new SessionDAO();
     }
 
@@ -94,5 +103,9 @@ public class SessionController {
     public void updateLastActivity(long id)
     {
         dao.updateLastActivity(id);
+    }
+
+    public boolean hasSessionCurrently(Account account) throws SQLException, ClassNotFoundException {
+        return dao.hasSession(account);
     }
 }

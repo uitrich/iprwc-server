@@ -1,6 +1,10 @@
 package nl.iprwc.model;
 
+import nl.iprwc.controller.AuthenticationController;
+import nl.iprwc.controller.SessionController;
+
 import java.security.Principal;
+import java.sql.SQLException;
 
 public class User implements Principal {
     private static final String NAME_NO_ACCOUNT = "Anonymous User";
@@ -53,5 +57,9 @@ public class User implements Principal {
         }
 
         return false;
+    }
+
+    public boolean isAuthenticated() throws SQLException, ClassNotFoundException {
+        return SessionController.getInstance().hasSessionCurrently(account);
     }
 }

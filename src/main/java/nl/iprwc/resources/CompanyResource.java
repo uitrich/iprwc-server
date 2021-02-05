@@ -7,7 +7,6 @@ import io.dropwizard.auth.Auth;
 import nl.iprwc.controller.AccountController;
 import nl.iprwc.controller.BodyLocationController;
 import nl.iprwc.controller.CompanyController;
-import nl.iprwc.controller.SuperController;
 import nl.iprwc.exception.NotFoundException;
 import nl.iprwc.model.Account;
 import nl.iprwc.model.Authentication;
@@ -29,7 +28,7 @@ public class CompanyResource {
     private final CompanyController controller;
 
     public CompanyResource() {
-        controller = SuperController.getInstance().getCompanyController();
+        controller = CompanyController.getInstance();
     }
 
     @GET

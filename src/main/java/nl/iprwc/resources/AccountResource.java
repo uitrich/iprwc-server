@@ -6,14 +6,16 @@ import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.sun.media.sound.InvalidDataException;
 import io.dropwizard.auth.Auth;
+import nl.iprwc.Request.AccountRequest;
 import nl.iprwc.controller.AccountController;
-import nl.iprwc.controller.SuperController;
 import nl.iprwc.model.Account;
 import nl.iprwc.model.Authentication;
 import nl.iprwc.model.User;
 import nl.iprwc.view.View;
 
 import javax.annotation.security.RolesAllowed;
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -26,7 +28,7 @@ public class AccountResource {
     private final AccountController controller;
 
     public AccountResource() {
-        controller = SuperController.getInstance().getAccountController();
+        controller = AccountController.getInstance();
     }
 
     @GET
@@ -81,7 +83,7 @@ public class AccountResource {
     @POST
     @Path("/makeAccount")
     @JsonView(View.Public.class)
-    public Response createAccount(Account account) {
+    public Response createAccount(@NotNull @Valid AccountRequest account) {
         try{
             Account newAccount = controller.create(account);
             return Response.status(Response.Status.OK).entity(newAccount).build();
@@ -109,9 +111,8 @@ public class AccountResource {
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     @RolesAllowed("Role_Admin")
-    public Response updateAccount(String gsonInput) {
-        JsonObject json = new Gson().fromJson(gsonInput, JsonObject.class);
-        return Response.status(Response.Status.OK).entity(controller.updateAccount(fromObject(json))).build();
+    public Response updateAccount(Account account) {
+        return Response.status(Response.Status.OK).entity(controller.updateAccount(account)).build();
     }
 
     @DELETE

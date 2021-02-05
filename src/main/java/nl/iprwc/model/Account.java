@@ -3,11 +3,12 @@ package nl.iprwc.model;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonView;
-import nl.iprwc.Utils.Validator;
+import nl.iprwc.constraints.Validator;
 import nl.iprwc.view.View;
 
 import javax.persistence.Entity;
 import javax.persistence.Table;
+import javax.validation.constraints.NotNull;
 import java.util.*;
 
 @Entity
@@ -58,7 +59,7 @@ public class Account {
     }
 
     public Account(String firstName, String lastName, String mailAddress, String passwordHash) {
-        this.id = id;
+        this.id = UUID.randomUUID().toString();
         this.firstName = firstName;
         this.lastName = lastName;
         this.mailAddress = mailAddress.toLowerCase();
@@ -102,52 +103,6 @@ public class Account {
         }
         return false;
     };
-
-    /**
-     * Check if the field for the model are valid.
-     * @return
-     */
-    public List<FormError> isValid(){
-        List<FormError> resultList = new ArrayList<FormError>();
-
-        if(this.getMailAddress() != null){
-            this.mailAddress  = this.mailAddress.toLowerCase();
-            Validator.MailStatus result = Validator.isMailAddress(this.getMailAddress());
-            if(result != Validator.MailStatus.OK){
-                resultList.add(new FormError("mailAddress", result));
-            }
-        }
-        if(this.getFirstName() != null){
-            Validator.NameStatus result = Validator.isName(this.getFirstName());
-            if(result != Validator.NameStatus.OK){
-                resultList.add(new FormError("firstName", result));
-            }
-        }
-
-        if(this.getLastName() != null){
-            Validator.NameStatus result = Validator.isName(this.getLastName());
-            if(result != Validator.NameStatus.OK){
-                resultList.add(new FormError("lastName", result));
-            }
-        }
-
-        if(this.getPasswordHash() != null){
-            Validator.PasswordStatus result = Validator.isPassword(this.getPasswordHash());
-            if(result != Validator.PasswordStatus.OK){
-                resultList.add(new FormError("password", result));
-            }
-        }
-
-        if(this.getReference() != null){
-            Validator.ReferenceStatus result = Validator.isReference(this.getReference());
-            if(result != Validator.ReferenceStatus.OK){
-                resultList.add(new FormError("reference", result));
-            }
-        }
-
-        return resultList;
-
-    }
 
     /**
      * Take a account, and combine it with a new account.

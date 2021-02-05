@@ -26,7 +26,7 @@ public class CategoryResource {
     private final CategoryController controller;
 
     public CategoryResource() {
-        controller = SuperController.getInstance().getCategoryController();
+        controller = CategoryController.getInstance();
     }
 
     @GET

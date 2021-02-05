@@ -1,5 +1,6 @@
 package nl.iprwc.controller;
 
+import nl.iprwc.Request.CredentialsRequest;
 import nl.iprwc.Response.SessionStateResponse;
 import nl.iprwc.exception.NotFoundException;
 import nl.iprwc.hash.BCrypt;
@@ -10,15 +11,26 @@ import nl.iprwc.model.Session;
 public class AuthenticationController {
     private AccountController accountController;
     private SessionController sessionController;
+    private static AuthenticationController instance;
 
-    public AuthenticationController()
-    {
-        sessionController = SuperController.getInstance().getSessionController();
-        accountController = SuperController.getInstance().getAccountController();
+    /**
+     * Create a singleton from supercontroller, this controller has access to all other controller and can be called from anywhere.
+     * @return
+     */
+    public static synchronized AuthenticationController getInstance() {
+        if (instance == null) {
+            instance = new AuthenticationController();
+        }
+
+        return instance;
+    }
+    private AuthenticationController() {
+        accountController = AccountController.getInstance();
+        sessionController = SessionController.getInstance();
     }
 
 
-    public Session logIn(Authentication authentication)
+    public Session logIn(CredentialsRequest authentication)
     {
         Account account;
 

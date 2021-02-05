@@ -1,7 +1,6 @@
 package nl.iprwc.db;
 
 import nl.iprwc.controller.ProductController;
-import nl.iprwc.controller.SuperController;
 import nl.iprwc.model.Product;
 import nl.iprwc.model.ProductResponse;
 import nl.iprwc.model.User;
@@ -13,7 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ShoppingCartDAO {
-    ProductController productController = SuperController.getInstance().getProductController();
+    ProductController productController = ProductController.getInstance();
     public List<ProductResponse> AddToCart(String accountId, long productId) {
         try {
             boolean result = DatabaseService.getInstance()

@@ -8,7 +8,19 @@ import nl.iprwc.model.Category;
 import java.util.List;
 
 public class CategoryController {
-    CategoryDAO dao = new CategoryDAO();
+    private CategoryDAO dao;
+    private static CategoryController instance;
+
+    public static synchronized CategoryController getInstance() {
+        if (instance == null) {
+            instance = new CategoryController();
+        }
+
+        return instance;
+    }
+    private CategoryController() {
+        dao = new CategoryDAO();
+    }
 
     public int exists(String name) {
         return dao.exists(name);

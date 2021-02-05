@@ -16,12 +16,18 @@ import java.util.List;
 
 public class ProductController {
     private final ProductDAO dao;
-    private final GroupController groupController;
 
+    private static ProductController instance;
 
-    public ProductController() {
+    public static synchronized ProductController getInstance() {
+        if (instance == null) {
+            instance = new ProductController();
+        }
+
+        return instance;
+    }
+    private ProductController() {
         dao = new ProductDAO();
-        groupController = SuperController.getInstance().getGroupController();
     }
 
     public Product getFromId(long id) throws SQLException, ClassNotFoundException {
@@ -82,9 +88,9 @@ public class ProductController {
     }
 
     public Product splitResponse(ProductResponse product) {
-        long catId = SuperController.getInstance().getCategoryController().createIfNotExists(product.getCategory());
-        long comId = SuperController.getInstance().getCompanyController().createIfNotExists(product.getCompany());
-        long bodId = SuperController.getInstance().getBodyLocationController().createIfNotExists(product.getBody_location());
+        long catId = CategoryController.getInstance().createIfNotExists(product.getCategory());
+        long comId = CompanyController.getInstance().createIfNotExists(product.getCompany());
+        long bodId = BodyLocationController.getInstance().createIfNotExists(product.getBody_location());
 
         return new Product(product.getName(), product.getPrice(), bodId, catId, comId, product.getId(), product.getImage());
     }

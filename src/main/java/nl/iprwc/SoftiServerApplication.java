@@ -7,7 +7,10 @@ import io.dropwizard.configuration.EnvironmentVariableSubstitutor;
 import io.dropwizard.configuration.SubstitutingSourceProvider;
 import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
-import nl.iprwc.controller.SuperController;
+import nl.iprwc.controller.AccountController;
+import nl.iprwc.controller.AuthenticationController;
+import nl.iprwc.controller.BodyLocationController;
+import nl.iprwc.controller.CategoryController;
 import nl.iprwc.core.AccountAuthorizationFilter;
 import nl.iprwc.core.AddHeaderFilter;
 import nl.iprwc.healtcheck.DatabaseHealthCheck;
@@ -48,8 +51,6 @@ public class SoftiServerApplication extends Application<SoftiServerConfiguration
                         new EnvironmentVariableSubstitutor(false)
                 )
         );
-
-        SuperController.getInstance(); // init controllers
     }
 
 

@@ -6,7 +6,6 @@ import com.sun.media.sound.InvalidDataException;
 import io.dropwizard.auth.Auth;
 import nl.iprwc.controller.AccountController;
 import nl.iprwc.controller.BodyLocationController;
-import nl.iprwc.controller.SuperController;
 import nl.iprwc.exception.NotFoundException;
 import nl.iprwc.model.Account;
 import nl.iprwc.model.Authentication;
@@ -28,7 +27,7 @@ public class BodyLocationResource {
     private final BodyLocationController controller;
 
     public BodyLocationResource() {
-        controller = SuperController.getInstance().getBodyLocationController();
+        controller = BodyLocationController.getInstance();
     }
 
     @GET

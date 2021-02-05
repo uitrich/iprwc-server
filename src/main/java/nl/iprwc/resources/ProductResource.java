@@ -6,7 +6,6 @@ import io.dropwizard.auth.Auth;
 import io.dropwizard.jersey.params.LongParam;
 import nl.iprwc.controller.GroupController;
 import nl.iprwc.controller.ProductController;
-import nl.iprwc.controller.SuperController;
 import nl.iprwc.model.Product;
 import nl.iprwc.model.ProductResponse;
 import nl.iprwc.model.User;
@@ -32,11 +31,9 @@ public class ProductResource {
     private static Gson gson;
 
     private final ProductController controller;
-    private GroupController groupController;
 
     public ProductResource() {
-        this.controller = SuperController.getInstance().getProductController();
-        this.groupController = SuperController.getInstance().getGroupController();
+        this.controller = ProductController.getInstance();
         gson = new Gson();
     }
 

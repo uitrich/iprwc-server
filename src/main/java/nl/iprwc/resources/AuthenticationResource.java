@@ -3,9 +3,11 @@ package nl.iprwc.resources;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.dropwizard.auth.Auth;
 import io.dropwizard.hibernate.UnitOfWork;
+import nl.iprwc.Request.CredentialsRequest;
+import nl.iprwc.controller.AccountController;
 import nl.iprwc.controller.AuthenticationController;
-import nl.iprwc.controller.SuperController;
 import nl.iprwc.exception.NotFoundException;
+import nl.iprwc.model.Account;
 import nl.iprwc.model.Authentication;
 import nl.iprwc.model.Session;
 import nl.iprwc.Response.SessionStateResponse;
@@ -13,6 +15,8 @@ import nl.iprwc.Utils.KillCookie;
 import nl.iprwc.Response.SuccessResponse;
 import nl.iprwc.Utils.SetCookie;
 
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 import javax.ws.rs.*;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.core.*;
@@ -27,17 +31,15 @@ public class AuthenticationResource
 
     public AuthenticationResource()
     {
-        controller = SuperController.getInstance().getAuthenticationController();
+        controller = AuthenticationController.getInstance();
     }
 
     @POST
     @UnitOfWork
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response logIn(String auth) throws IOException {
-        ObjectMapper objectMapper = new ObjectMapper();
-        Authentication authentication = objectMapper.readValue(auth, Authentication.class);
-        Session session = controller.logIn(authentication);
+    public Response logIn(@NotNull @Valid CredentialsRequest auth) {
+        Session session = controller.logIn(auth);
         if (session == null) {
             throw new WebApplicationException(org.eclipse.jetty.server.Response.SC_UNAUTHORIZED);
         }

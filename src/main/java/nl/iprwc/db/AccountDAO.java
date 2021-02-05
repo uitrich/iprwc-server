@@ -1,16 +1,15 @@
 package nl.iprwc.db;
 
-import com.google.common.base.Optional;
+import nl.iprwc.Request.AccountRequest;
 import nl.iprwc.groups.GroupService;
 import nl.iprwc.model.Account;
 import nl.iprwc.model.Authentication;
 import nl.iprwc.model.Group;
-import nl.iprwc.model.ProductResponse;
 import nl.iprwc.sql.DatabaseService;
 import nl.iprwc.sql.NamedParameterStatement;
-import org.hibernate.id.GUIDGenerator;
 
 import javax.ws.rs.NotFoundException;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -81,7 +80,7 @@ public class AccountDAO {
         }
     }
 
-    public String create(Account account) throws SQLException, ClassNotFoundException {
+    public String create(AccountRequest account) throws SQLException, ClassNotFoundException {
         NamedParameterStatement statement = DatabaseService.getInstance()
                 .createNamedPreparedStatement("INSERT INTO public.account "
                 + "(id, firstname, lastname, mailaddress, password, postal_code, house_number, reference) VALUES "
@@ -89,11 +88,11 @@ public class AccountDAO {
         statement.setString("id", UUID.randomUUID().toString());
         statement.setString("firstname", account.getFirstName());
         statement.setString("lastname", account.getLastName());
-        statement.setString("postal_code", account.getPostal_code());
-        statement.setString("house_number", account.getHouse_number());
-        statement.setString("password", account.getPasswordHash());
-        statement.setString("reference", account.getReference());
-        statement.setString("mailaddres s", account.getMailAddress());
+        statement.setString("postal_code", account.getPostalCode());
+        statement.setString("house_number", account.getHouseNumber());
+        statement.setString("password", account.getPassword());
+        statement.setString("reference", "Role_Customer");
+        statement.setString("mailaddress", account.getMailAddress());
 
 
         if(statement.executeUpdate() == 0){
@@ -134,19 +133,28 @@ public class AccountDAO {
     public boolean addGroupToAccount(Account account, String groupName) throws SQLException, ClassNotFoundException {
         Group group = getGroupIdByName(groupName);
         if(getFromId(account.getId()).getId() != null && account.getId() != null && !accountMemberRelationExists(account.getId(), group.getId())) {
-            NamedParameterStatement statement = DatabaseService.getInstance().createNamedPreparedStatement("INSERT INTO account_group_member (account_id, group_id) " +
-                    "VALUES (:accountId, :groupId)");
+            NamedParameterStatement statement = DatabaseService.getInstance()
+                    .createNamedPreparedStatement(
+                            "INSERT INTO account_group_member (id, account_id, group_id) VALUES (:id, :accountId, :groupId)"
+                    );
+            statement.setParameter("id", getAccountGroupMembersMax());
             statement.setParameter("accountId", account.getId());
             statement.setParameter("groupId", group.getId());
-            int affectedRows = statement.executeUpdate();
-            if(affectedRows > 0){
-                return true;
-            }else{
-                return false;
-            }
+
+
+            PreparedStatement preparedStatement = DatabaseService.getInstance().createPreparedStatement(statement.toString());
+            return preparedStatement.execute();
         }else{
             throw new NotFoundException("Account not found");
         }
+    }
+    private long getAccountGroupMembersMax() throws SQLException, ClassNotFoundException {
+        List<Long> longs= new ArrayList<>();
+        ResultSet resultSet = DatabaseService.getInstance()
+                .createPreparedStatement("SELECT id FROM account_group_member").executeQuery();
+        while (resultSet.next())
+            longs.add(resultSet.getLong("id"));
+        return longs.size() + 2;
     }
 
     private boolean accountMemberRelationExists(String accountId, long groupId) throws SQLException, ClassNotFoundException {

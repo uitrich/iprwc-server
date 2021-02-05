@@ -6,7 +6,6 @@ import io.dropwizard.auth.Auth;
 import nl.iprwc.controller.AccountController;
 import nl.iprwc.controller.GroupController;
 import nl.iprwc.controller.ShoppingCartController;
-import nl.iprwc.controller.SuperController;
 import nl.iprwc.model.Account;
 import nl.iprwc.model.Authentication;
 import nl.iprwc.model.User;
@@ -26,8 +25,8 @@ public class ShoppingCartResource {
     private final GroupController groupController;
 
     public ShoppingCartResource() {
-        controller = SuperController.getInstance().getShoppingCartController();
-        groupController = SuperController.getInstance().getGroupController();
+        controller = ShoppingCartController.getInstance();
+        groupController = GroupController.getInstance();
     }
 
     @GET
