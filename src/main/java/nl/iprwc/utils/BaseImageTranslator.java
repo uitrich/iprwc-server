@@ -1,17 +1,16 @@
 package nl.iprwc.utils;
 
+import sun.misc.BASE64Decoder;
+
+import javax.imageio.ImageIO;
 import java.awt.*;
-import java.awt.image.*;
+import java.awt.image.BufferedImage;
 import java.io.*;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.Base64;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
-
-import sun.misc.BASE64Decoder;
-
-import javax.imageio.ImageIO;
 
 public class BaseImageTranslator {
     private static BaseImageTranslator instance;
