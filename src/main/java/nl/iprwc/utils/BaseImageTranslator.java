@@ -1,4 +1,4 @@
-package nl.iprwc.Utils;
+package nl.iprwc.utils;
 
 import java.awt.*;
 import java.awt.image.*;

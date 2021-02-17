@@ -1,4 +1,4 @@
-package nl.iprwc.Utils.validation;
+package nl.iprwc.utils.validation;
 
 public enum ValidatorResult {
     ok,

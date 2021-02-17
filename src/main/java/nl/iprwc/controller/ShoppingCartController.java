@@ -1,6 +1,8 @@
 package nl.iprwc.controller;
 
 import nl.iprwc.db.ShoppingCartDAO;
+import nl.iprwc.exception.InvalidOperationException;
+import nl.iprwc.exception.NotFoundException;
 import nl.iprwc.model.Product;
 import nl.iprwc.model.ProductResponse;
 import nl.iprwc.model.User;
@@ -22,41 +24,53 @@ public class ShoppingCartController {
     private ShoppingCartController() {
         dao = new ShoppingCartDAO();
     }
-    public List<ProductResponse> addItem(long id, String user) {
-        if (!dao.isItemAlreadyIn(id, user)) {
-            return dao.AddToCart( user, id);
-        }
-        dao.addQuantity(id, user);
-        return dao.getShoppingCartContents(user);
-    }
-    public List<ProductResponse> getShoppingcart(User user) {
-     return dao.getShoppingCartContents(user.getAccount().getId());
-    }
-    public List<ProductResponse> getShoppingcart(String user) {
-        return dao.getShoppingCartContents(user);
-    }
-
-    public List<ProductResponse> deleteItem(long id, String user) {
-        return dao.deleteItem(id, user);
-    }
-
-    public long updateQuantity(long productid, long amount, String id) {
-        return dao.updateQuantity(productid, amount, id);
-    }
-
-    public List<List<Long>> getQuantity(String id) {
-        return dao.getQuantities(id);
-    }
-
-    public boolean delete(String id) {
+    public void addItem(long id, String user) throws NotFoundException, InvalidOperationException {
         try {
-            return DatabaseService.getInstance()
-                    .createNamedPreparedStatement("DELETE FROM shoppingcart WHERE account_id = :id")
-                    .setParameter("id", id)
-            .execute();
+            if (!dao.isItemAlreadyIn(id, user)) {
+                dao.AddToCart( user, id);
+            }
+            else dao.addQuantity(id, user);
         } catch (SQLException | ClassNotFoundException e) {
-            e.printStackTrace();
-            return false;
+            throw new InvalidOperationException();
+        }
+    }
+    public List<ProductResponse> getShoppingcart(String user) throws NotFoundException, InvalidOperationException {
+        try {
+            return ProductController.getInstance().getFromIds(dao.getShoppingCartContents(user));
+        } catch (SQLException | ClassNotFoundException e) {
+            throw new InvalidOperationException();
+        }
+    }
+
+    public void deleteItem(long id, String user) throws NotFoundException, InvalidOperationException {
+        try {
+            dao.deleteItem(id, user);
+        } catch (SQLException | ClassNotFoundException e) {
+            throw new InvalidOperationException();
+        }
+    }
+
+    public void updateQuantity(long productid, long amount, String id) throws NotFoundException, InvalidOperationException {
+        try {
+            dao.updateQuantity(productid, amount, id);
+        } catch (SQLException | ClassNotFoundException e) {
+            throw new InvalidOperationException();
+        }
+    }
+
+    public List<List<Long>> getQuantity(String id) throws InvalidOperationException {
+        try {
+            return dao.getQuantities(id);
+        } catch (SQLException | ClassNotFoundException e) {
+            throw new InvalidOperationException();
+        }
+    }
+
+    public boolean delete(String id) throws InvalidOperationException {
+        try {
+            return dao.deleteAccount(id);
+        } catch (SQLException | ClassNotFoundException e) {
+            throw new InvalidOperationException();
         }
     }
 }

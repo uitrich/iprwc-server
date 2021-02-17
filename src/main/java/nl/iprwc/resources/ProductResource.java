@@ -6,6 +6,8 @@ import io.dropwizard.auth.Auth;
 import io.dropwizard.jersey.params.LongParam;
 import nl.iprwc.controller.GroupController;
 import nl.iprwc.controller.ProductController;
+import nl.iprwc.exception.InvalidOperationException;
+import nl.iprwc.exception.NotFoundException;
 import nl.iprwc.model.Product;
 import nl.iprwc.model.ProductResponse;
 import nl.iprwc.model.User;
@@ -45,81 +47,46 @@ public class ProductResource {
                                    @QueryParam("company")                                               List<Integer> company,
                                    @QueryParam("bodyLocation")                                          List<Integer> bodyLocation,
                                    @QueryParam("search")                                                String search
-    ) {
-        try {
-            return Response.status(Response.Status.OK).entity(controller.getAll(page, pageSize, search, category, company, bodyLocation)).build();
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return Response.status(Response.Status.BAD_REQUEST).build();
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-            return Response.status(Response.Status.NOT_FOUND).build();
-        } catch ( Exception e) {
-            e.printStackTrace();
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
-        }
+    ) throws NotFoundException, InvalidOperationException {
+        return Response.status(Response.Status.OK).entity(controller.getAll(page, pageSize, search, category, company, bodyLocation)).build();
+
     }
     @GET
     @Path("/admin")
     @RolesAllowed("Role_Admin")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getAllProducts() {
-        try {
-            return Response.status(Response.Status.OK).entity(controller.getAllIndestinctive()).build();
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return Response.status(Response.Status.BAD_REQUEST).build();
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-            return Response.status(Response.Status.NOT_FOUND).build();
-        } catch ( Exception e) {
-            e.printStackTrace();
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
-        }
+    public Response getAllProducts() throws NotFoundException, InvalidOperationException {
+        return Response.status(Response.Status.OK).entity(controller.getAllIndestinctive()).build();
     }
 
     @GET
     @Path("/{id}")
     @Produces(MediaType.APPLICATION_JSON)
     @RolesAllowed("Role_Admin")
-    public Response getFromId(@PathParam("id") long id, @Auth User user) {
-        try {
-            Product result = controller.getFromId(id);
-            return Response.status(Response.Status.OK).entity(result).build();
-        }
-        catch (SQLException | ClassNotFoundException err) {
-            return Response.status(Response.Status.NOT_FOUND).type(MediaType.APPLICATION_JSON_TYPE).build();
-        }
+    public Response getFromId(@PathParam("id") long id, @Auth User user) throws InvalidOperationException {
+        Product result = controller.getFromId(id);
+        return Response.status(Response.Status.OK).entity(result).build();
+
     }
 
     @GET
     @Path("/{id}/image")
     @RolesAllowed("Role_Admin")
     @Produces("image/png")
-    public Response getImageFromId(@PathParam("id") long id) {
-        try {
+    public Response getImageFromId(@PathParam("id") long id) throws InvalidOperationException {
             return Response.status(Response.Status.OK).entity(controller.getImageFromId(id)).build();
-        } catch (IOException e) {
-            e.printStackTrace();
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
-        }
     }
     @GET
     @Path("/top/{range}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getTop(@PathParam("range") long range) {
-        try {
-            return Response.status(Response.Status.OK).entity(controller.getTop(range)).build();
-        } catch (NotFoundException e) {
-            e.printStackTrace();
-            return Response.status(Response.Status.NOT_FOUND).build();
-        }
+    public Response getTop(@PathParam("range") long range) throws NotFoundException, InvalidOperationException {
+        return Response.status(Response.Status.OK).entity(controller.getTop(range)).build();
     }
 
     @POST
     @RolesAllowed("Role_Admin")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response addProduct(String json) {
+    public Response addProduct(String json) throws InvalidOperationException, NotFoundException {
         ProductResponse product = gson.fromJson(json, ProductResponse.class);
         return Response.status(Response.Status.OK).entity(controller.insertAdd(product)).build();
     }
@@ -127,7 +94,7 @@ public class ProductResource {
     @PUT
     @RolesAllowed("Role_Admin")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response updateProduct(String json) {
+    public Response updateProduct(String json) throws InvalidOperationException, NotFoundException {
         ProductResponse product = gson.fromJson(json, ProductResponse.class);
         return Response.status(Response.Status.OK).entity(controller.update(controller.splitResponse(product))).build();
     }
@@ -136,7 +103,7 @@ public class ProductResource {
     @Path("/{id}")
     @RolesAllowed("Role_Admin")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response deleteProduct(@PathParam("id") long id) {
+    public Response deleteProduct(@PathParam("id") long id) throws InvalidOperationException {
         return Response.status(Response.Status.OK).entity(controller.delete(id)).build();
     }
 
@@ -144,7 +111,7 @@ public class ProductResource {
     @RolesAllowed({"Role_Customer"})
     @Path("/categories")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getCategories() {
+    public Response getCategories() throws InvalidOperationException {
         return Response.status(Response.Status.OK).entity(controller.getTypeDesc("category")).build();
     }
 
@@ -152,7 +119,7 @@ public class ProductResource {
     @RolesAllowed({"Role_Customer"})
     @Path("/companies")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getCompanies() {
+    public Response getCompanies() throws InvalidOperationException {
         return Response.status(Response.Status.OK).entity(controller.getTypeDesc("company")).build();
     }
 
@@ -160,7 +127,7 @@ public class ProductResource {
     @RolesAllowed({"Role_Customer"})
     @Path("/bodylocation")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getBodyLocations() {
+    public Response getBodyLocations() throws InvalidOperationException {
         return Response.status(Response.Status.OK).entity(controller.getTypeDesc("body_location")).build();
     }
 }

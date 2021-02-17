@@ -8,15 +8,10 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public class GroupDAO {
-    public boolean deleteAccountGroup(String id) {
-        try {
-            return DatabaseService.getInstance()
-                    .createNamedPreparedStatement("DELETE FROM account_group_member WHERE account_id = :id")
-                    .setParameter("account_id", id)
-            .execute();
-        } catch (SQLException | ClassNotFoundException e) {
-            e.printStackTrace();
-            return false;
-        }
+    public boolean deleteAccountGroup(String id) throws SQLException, ClassNotFoundException {
+        return DatabaseService.getInstance()
+                .createNamedPreparedStatement("DELETE FROM account_group_member WHERE account_id = :id")
+                .setParameter("account_id", id)
+        .execute();
     }
 }

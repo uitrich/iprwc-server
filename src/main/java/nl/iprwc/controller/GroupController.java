@@ -1,8 +1,11 @@
 package nl.iprwc.controller;
 
 import nl.iprwc.db.GroupDAO;
+import nl.iprwc.exception.InvalidOperationException;
 import nl.iprwc.model.Group;
 import nl.iprwc.model.User;
+
+import java.sql.SQLException;
 
 public class GroupController {
     private GroupDAO dao;
@@ -19,7 +22,11 @@ public class GroupController {
         dao = new GroupDAO();
     }
 
-    public boolean deleteAccountGroup(String id) {
-        return dao.deleteAccountGroup(id);
+    public boolean deleteAccountGroup(String id) throws InvalidOperationException {
+        try {
+            return dao.deleteAccountGroup(id);
+        } catch (SQLException | ClassNotFoundException e) {
+            throw new InvalidOperationException();
+        }
     }
 }

@@ -8,6 +8,7 @@ import com.sun.media.sound.InvalidDataException;
 import io.dropwizard.auth.Auth;
 import nl.iprwc.Request.AccountRequest;
 import nl.iprwc.controller.AccountController;
+import nl.iprwc.exception.InvalidOperationException;
 import nl.iprwc.model.Account;
 import nl.iprwc.model.Authentication;
 import nl.iprwc.model.User;
@@ -32,87 +33,55 @@ public class AccountResource {
     }
 
     @GET
-    @Produces(MediaType.APPLICATION_JSON)
     @RolesAllowed({"Role_Customer", "Role_Admin"})
-    public Response getAccount(@Auth User user) {
-        try {
-            return Response.status(Response.Status.OK).entity(controller.getFromId(user.getAccount().getId())).build();
-        } catch (NotFoundException e) {
-            return Response.status(Response.Status.NOT_FOUND).type(MediaType.APPLICATION_JSON_TYPE).build();
-        }
+    public Response getAccount(@Auth User user) throws InvalidOperationException {
+        return Response.status(Response.Status.OK).entity(controller.getFromId(user.getAccount().getId())).build();
     }
     @GET
-    @Produces(MediaType.APPLICATION_JSON)
     @Path("/admin")
     @RolesAllowed("Role_Admin")
-    public Response getAccounts(@Auth User user) {
-        try {
-            return Response.status(Response.Status.OK).entity(controller.getAll()).build();
-        } catch (NotFoundException e) {
-            return Response.status(Response.Status.NOT_FOUND).type(MediaType.APPLICATION_JSON_TYPE).build();
-        } catch (SQLException e) {
-            return Response.status(Response.Status.CONFLICT).build();
-        } catch (ClassNotFoundException e) {
-            return Response.status(Response.Status.BAD_REQUEST).build();
-        }
+    public Response getAccounts(@Auth User user) throws InvalidOperationException {
+        return Response.status(Response.Status.OK).entity(controller.getAll()).build();
     }
 
     @GET
     @Path("/admin/{id}")
-    @Produces(MediaType.APPLICATION_JSON)
     @RolesAllowed("Role_Admin")
-    public Response getAccount(@PathParam("id") String personId) {
-        try {
+    public Response getAccount(@PathParam("id") String personId) throws InvalidOperationException {
             return Response.status(Response.Status.OK).entity(controller.getFromId(personId)).build();
-        } catch (NotFoundException e) {
-            return Response.status(Response.Status.NOT_FOUND).type(MediaType.APPLICATION_JSON_TYPE).build();
-        }
     }
 
     @POST
-    @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
-    @JsonView(View.Public.class)
-    public Response getAccount(Authentication loginAttempt) {
-        try {
+    public Response getAccount(Authentication loginAttempt) throws InvalidOperationException {
             return Response.status(Response.Status.OK).entity(controller.tryLogin(loginAttempt)).build();
-        } catch (NotFoundException | SQLException | ClassNotFoundException e) {
-            return Response.status(Response.Status.NOT_FOUND).type(MediaType.APPLICATION_JSON_TYPE).build();
-        }
     }
     @POST
     @Path("/makeAccount")
-    @JsonView(View.Public.class)
-    public Response createAccount(@NotNull @Valid AccountRequest account) {
-        try{
+    public Response createAccount(@NotNull @Valid AccountRequest account) throws InvalidOperationException {
             Account newAccount = controller.create(account);
-            return Response.status(Response.Status.OK).entity(newAccount).build();
-        } catch (InvalidDataException e) {
-            return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();
-        }  catch (SQLException | ClassNotFoundException | NotFoundException e) {
-            e.printStackTrace();
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
-        } catch (nl.iprwc.exception.NotFoundException e) {
-            e.printStackTrace();
-            return Response.status(Response.Status.NOT_FOUND).build();
-        }
+            return Response.status(Response.Status.OK)
+                    .entity(newAccount)
+                    .build();
     }
 
     @PUT
     @Path("/update")
-    @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     @RolesAllowed("Role_Customer")
-    public Response updateAccount( @Auth User user) {
-        return Response.status(Response.Status.OK).entity(controller.updateAccount(user.getAccount())).build();
+    public Response updateAccount( @Auth User user, Account account) throws InvalidOperationException {
+        if (user.getAccount().getId().equals(account.getId()))
+            return Response.status(Response.Status.OK)
+                    .entity(controller.updateAccount(user.getAccount())).build();
+        return Response.status(Response.Status.FORBIDDEN).build();
     }
     @PUT
     @Path("admin/update")
-    @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     @RolesAllowed("Role_Admin")
-    public Response updateAccount(Account account) {
-        return Response.status(Response.Status.OK).entity(controller.updateAccount(account)).build();
+    public Response updateAccount(Account account) throws InvalidOperationException {
+        return Response.status(Response.Status.OK)
+                .entity(controller.updateAccount(account)).build();
     }
 
     @DELETE
@@ -120,8 +89,9 @@ public class AccountResource {
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     @RolesAllowed("Role_Customer")
-    public Response deleteAccount(@Auth User user) {
-        return Response.status(Response.Status.OK).entity(controller.deleteAccount(user.getAccount().getId())).build();
+    public Response deleteAccount(@Auth User user) throws InvalidOperationException {
+        return Response.status(Response.Status.OK)
+                .entity(controller.deleteAccount(user.getAccount().getId())).build();
     }
 
     @DELETE
@@ -129,27 +99,8 @@ public class AccountResource {
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     @RolesAllowed("Role_Admin")
-    public Response deleteAccount(@PathParam("id") String account) {
+    public Response deleteAccount(@PathParam("id") String account) throws InvalidOperationException {
         return Response.status(Response.Status.OK).entity(controller.deleteAccount(account)).build();
-    }
-
-    @GET
-    @Path("/reset/users")
-    public Response resetUserIds() throws SQLException, ClassNotFoundException {
-        for (Account account : controller.getAll()) {
-            controller.UpdateAccountId(account.getId());
-        }
-        return Response.status(Response.Status.OK).build();
-    }
-
-    private Account fromObject(JsonObject in) {
-        return new Account(
-                in.get("firstName").getAsString(),
-                in.get("lastName").getAsString(),
-                in.get("mailAddress").getAsString(),
-                in.get("postal_code").getAsString(),
-                in.get("house_number").getAsString()
-        );
     }
 
 }

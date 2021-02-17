@@ -1,4 +1,4 @@
-package nl.iprwc.Utils;
+package nl.iprwc.utils;
 
 import javax.ws.rs.core.NewCookie;
 

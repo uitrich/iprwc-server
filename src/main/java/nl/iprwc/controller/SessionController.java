@@ -1,7 +1,8 @@
 package nl.iprwc.controller;
 
-import nl.iprwc.Utils.Random;
+import nl.iprwc.utils.Random;
 import nl.iprwc.db.SessionDAO;
+import nl.iprwc.exception.InvalidOperationException;
 import nl.iprwc.exception.NotFoundException;
 import nl.iprwc.hash.Sha512;
 import nl.iprwc.model.Account;
@@ -32,8 +33,14 @@ public class SessionController {
      * @return
      * @throws NotFoundException
      */
-    public Session fromId(long id) throws NotFoundException {
-        return dao.fromId(id);
+    public Session fromId(long id) throws NotFoundException, InvalidOperationException {
+        try {
+            Session output = dao.fromId(id);
+            output.setAccount(AccountController.getInstance().getFromId(output.getAccount().getId()));
+            return output;
+        } catch (SQLException | ClassNotFoundException e) {
+            throw new InvalidOperationException();
+        }
     }
 
     /**
@@ -42,12 +49,24 @@ public class SessionController {
      * @return
      * @throws NotFoundException
      */
-    public Session fromSessionKey(String key) throws NotFoundException {
-        return dao.fromHashedSessionKey(new Sha512().hash(key), key);
+    public Session fromSessionKey(String key) throws NotFoundException, InvalidOperationException {
+        try {
+            Session output = dao.fromHashedSessionKey(new Sha512().hash(key), key);
+            output.setAccount(AccountController.getInstance().getFromId(output.getAccount().getId()));
+            return output;
+        } catch (SQLException | ClassNotFoundException e) {
+            throw new InvalidOperationException();
+        }
     }
 
-    public Session fromHashedSessionKey(String hashedKey) throws NotFoundException {
-        return dao.fromHashedSessionKey(hashedKey);
+    public Session fromHashedSessionKey(String hashedKey) throws NotFoundException, InvalidOperationException {
+        try {
+            Session output = dao.fromHashedSessionKey(hashedKey);
+            output.setAccount(AccountController.getInstance().getFromId(output.getAccount().getId()));
+            return output;
+        } catch (SQLException | ClassNotFoundException e) {
+            throw new InvalidOperationException();
+        }
     }
 
     public Session create(Account account)

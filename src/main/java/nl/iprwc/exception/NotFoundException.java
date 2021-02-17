@@ -1,6 +1,12 @@
 package nl.iprwc.exception;
 
-public class NotFoundException extends Exception {
+import nl.iprwc.exception.Base.BaseServerErrorException;
+
+import javax.ws.rs.ServerErrorException;
+
+public class NotFoundException extends BaseServerErrorException {
+    private static final int HTTP_CODE = 404;
+
     public NotFoundException() {
     }
 
@@ -20,8 +26,8 @@ public class NotFoundException extends Exception {
         super(message, cause, enableSuppression, writableStackTrace);
     }
 
-    public void throwClientNotFoundException() throws javax.ws.rs.NotFoundException
-    {
-        throw new javax.ws.rs.NotFoundException(getMessage(), this);
+    @Override
+    public ServerErrorException getHttpError() {
+        return new ServerErrorException(HTTP_CODE, this);
     }
 }

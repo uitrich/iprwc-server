@@ -1,9 +1,11 @@
 package nl.iprwc.controller;
 
 import nl.iprwc.db.BodyLocationDAO;
+import nl.iprwc.exception.InvalidOperationException;
 import nl.iprwc.exception.NotFoundException;
-import nl.iprwc.model.Body_Location;
+import nl.iprwc.model.BodyLocation;
 
+import java.sql.SQLException;
 import java.util.List;
 
 public class BodyLocationController {
@@ -25,36 +27,64 @@ public class BodyLocationController {
     }
 
     BodyLocationDAO dao = new BodyLocationDAO();
-    public List<Body_Location> getAll() {
-        return dao.getAll();
+    public List<BodyLocation> getAll() throws InvalidOperationException {
+        try {
+            return dao.getAll();
+        } catch (SQLException | ClassNotFoundException e) {
+            throw new InvalidOperationException();
+        }
     }
 
-    public Body_Location get(long id) throws NotFoundException {
-        return dao.get(id);
+    public BodyLocation get(long id) throws NotFoundException, InvalidOperationException {
+        try {
+            return dao.get(id);
+        } catch (SQLException | ClassNotFoundException e) {
+            throw new InvalidOperationException();
+        }
     }
 
-    public boolean update(long id, String name) {
-        return dao.update(id, name);
+    public boolean update(long id, String name) throws InvalidOperationException {
+        try {
+            return dao.update(id, name);
+        } catch (SQLException | ClassNotFoundException e) {
+            throw new InvalidOperationException();
+        }
     }
 
-    public long post(String name) {
-        return dao.post(name);
+    public long post(String name) throws InvalidOperationException {
+        try {
+            return dao.post(name);
+        }  catch (SQLException | ClassNotFoundException e) {
+            throw new InvalidOperationException();
+        }
     }
 
-    public boolean delete(long id) {
-        return dao.delete(id);
+    public boolean delete(long id) throws InvalidOperationException {
+        try {
+            return dao.delete(id);
+        }  catch (SQLException | ClassNotFoundException e) {
+            throw new InvalidOperationException();
+        }
     }
 
-    public long createIfNotExists(Body_Location body_location) {
+    public long createIfNotExists(BodyLocation body_location) throws InvalidOperationException, NotFoundException {
         int id = exists(body_location.getName());
         if (id == 0) {
-            dao.post(body_location.getName());
+            try {
+                dao.post(body_location.getName());
+            } catch (SQLException | ClassNotFoundException e) {
+                throw new InvalidOperationException();
+            }
             id = exists(body_location.getName());
         }
         return id;
     }
 
-    private int exists(String name) {
-        return dao.exists(name);
+    private int exists(String name) throws InvalidOperationException, NotFoundException {
+        try {
+            return dao.exists(name);
+        }  catch (SQLException | ClassNotFoundException e) {
+            throw new InvalidOperationException();
+        }
     }
 }

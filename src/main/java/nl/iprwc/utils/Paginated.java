@@ -1,4 +1,4 @@
-package nl.iprwc.Utils;
+package nl.iprwc.utils;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 

@@ -1,4 +1,4 @@
-package nl.iprwc.Utils.validation;
+package nl.iprwc.utils.validation;
 
 import java.util.HashMap;
 import java.util.Map;

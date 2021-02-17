@@ -1,26 +1,21 @@
 package nl.iprwc.resources;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import io.dropwizard.auth.Auth;
 import io.dropwizard.hibernate.UnitOfWork;
 import nl.iprwc.Request.CredentialsRequest;
-import nl.iprwc.controller.AccountController;
 import nl.iprwc.controller.AuthenticationController;
+import nl.iprwc.exception.InvalidOperationException;
 import nl.iprwc.exception.NotFoundException;
-import nl.iprwc.model.Account;
-import nl.iprwc.model.Authentication;
 import nl.iprwc.model.Session;
 import nl.iprwc.Response.SessionStateResponse;
-import nl.iprwc.Utils.KillCookie;
+import nl.iprwc.utils.KillCookie;
 import nl.iprwc.Response.SuccessResponse;
-import nl.iprwc.Utils.SetCookie;
+import nl.iprwc.utils.SetCookie;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.ws.rs.*;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.core.*;
-import java.io.IOException;
 
 @Path("/api/authentication")
 public class AuthenticationResource
@@ -38,7 +33,7 @@ public class AuthenticationResource
     @UnitOfWork
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response logIn(@NotNull @Valid CredentialsRequest auth) {
+    public Response logIn(@NotNull @Valid CredentialsRequest auth) throws InvalidOperationException {
         Session session = controller.logIn(auth);
         if (session == null) {
             throw new WebApplicationException(org.eclipse.jetty.server.Response.SC_UNAUTHORIZED);
@@ -53,8 +48,7 @@ public class AuthenticationResource
 
     @DELETE
     public Response logOut(
-            @Context ContainerRequestContext requestContext)
-    {
+            @Context ContainerRequestContext requestContext) throws NotFoundException, InvalidOperationException {
         if (requestContext.getCookies().containsKey(COOKIE_KEY)) {
             String sessionKey = requestContext.getCookies().get(COOKIE_KEY).getValue();
             controller.logOut(sessionKey);
@@ -67,8 +61,7 @@ public class AuthenticationResource
         }
 
         return Response
-                .ok()
-                .entity(new SuccessResponse())
+                .status(Response.Status.BAD_REQUEST)
                 .build();
     }
 
@@ -76,7 +69,7 @@ public class AuthenticationResource
     public SessionStateResponse isActive(
             @Context ContainerRequestContext requestContext,
             @DefaultValue("false") @QueryParam("update") boolean update
-    ) {
+    ) throws NotFoundException, InvalidOperationException {
         if (!requestContext.getCookies().containsKey(COOKIE_KEY)) {
             return new SessionStateResponse(false);
         }
@@ -85,12 +78,8 @@ public class AuthenticationResource
         SessionStateResponse state = controller.getSessionState(sessionKey);
 
         if (state.isValid() && update) {
-            try {
                 controller.updateSession(sessionKey);
                 state = controller.getSessionState(sessionKey);
-            } catch (NotFoundException e) {
-                // do nothing
-            }
         }
 
         return state;

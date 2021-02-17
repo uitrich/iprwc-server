@@ -41,17 +41,13 @@ public class AccountDAO {
         return null;
     }
 
-    public Account getFromId(String id) {
-        try {
-            return
-            fromResultSet(DatabaseService.getInstance()
-                    .createNamedPreparedStatement("SELECT * FROM Account WHERE id = :id")
-                    .setParameter("id", id)
-                    .executeQuery());
-        } catch (SQLException | ClassNotFoundException e) {
-            e.printStackTrace();
-            return null;
-        }
+    public Account getFromId(String id) throws SQLException, ClassNotFoundException {
+        return
+        fromResultSet(DatabaseService.getInstance()
+                .createNamedPreparedStatement("SELECT * FROM Account WHERE id = :id")
+                .setParameter("id", id)
+                .executeQuery());
+
     }
 
     public Account tryLogin(String username, String password) throws SQLException, ClassNotFoundException {
@@ -64,20 +60,6 @@ public class AccountDAO {
                     .executeQuery()
         );
         return account.getMailAddress() == null ?  null : account;
-    }
-
-    public boolean makeAccount(Authentication value) {
-        try {
-            return DatabaseService.getInstance()
-                    .createNamedPreparedStatement("INSERT INTO Account(mailaddress, password, postal_code, house_number)" +
-                            " VALUES (:username, :password, '3214', '2a')")
-                    .setParameter("username", value.getMailAddress())
-                    .setParameter("password", value.getPassword())
-            .execute();
-        } catch (SQLException | ClassNotFoundException e) {
-            e.printStackTrace();
-            return false;
-        }
     }
 
     public String create(AccountRequest account) throws SQLException, ClassNotFoundException {
@@ -172,25 +154,20 @@ public class AccountDAO {
 
     }
 
-    public Account getAccountFromMail(String mail){
-        try{
+    public Account getAccountFromMail(String mail) throws SQLException, ClassNotFoundException {
             NamedParameterStatement statement = DatabaseService.getInstance()
                     .createNamedPreparedStatement("SELECT * FROM account WHERE mailaddress = :mailaddress");
             statement.setParameter("mailaddress", mail);
             ResultSet result = statement.executeQuery();
             Account account;
             account = fromResultSet(result);
-            return account;
-        }catch (SQLException | ClassNotFoundException e) {
-            e.printStackTrace();
-        }
+            if (account != null) return account;
         //return Optional.of(get(id));
         throw new NullPointerException();
     }
 
-    public Account updateAccount(Account account) {
+    public Account updateAccount(Account account) throws SQLException, ClassNotFoundException {
         account = replaceNull(account);
-        try {
             NamedParameterStatement statement = DatabaseService.getInstance()
                     .createNamedPreparedStatement(
                             "UPDATE account SET" +
@@ -218,23 +195,13 @@ public class AccountDAO {
             }else{
                 return null;
             }
-
-        } catch (SQLException | ClassNotFoundException e) {
-            e.printStackTrace();
-            return null;
-        }
     }
 
-    public boolean delete(String account) {
-        try {
+    public boolean delete(String account) throws SQLException, ClassNotFoundException {
             return DatabaseService.getInstance()
                     .createNamedPreparedStatement("DELETE FROM account WHERE id = :id")
                     .setParameter("id", account)
             .execute();
-        } catch (SQLException | ClassNotFoundException e) {
-            e.printStackTrace();
-            return false;
-        }
     }
 
     public List<Account> getAll() throws SQLException, ClassNotFoundException {
@@ -255,17 +222,8 @@ public class AccountDAO {
         }
         return result;
     }
-    public void UpdateId(String oldId, String newId) throws SQLException, ClassNotFoundException {
-        DatabaseService.getInstance().createNamedPreparedStatement(
-                "UPDATE account SET" +
-                " id = :newId " +
-                        "WHERE id = :oldId")
-                .setParameter("newId", newId)
-                .setParameter("oldId", oldId)
-                .executeUpdate();
-    }
 
-    private Account replaceNull(Account account) {
+    private Account replaceNull(Account account) throws SQLException, ClassNotFoundException {
         Account currentAccount = getAccountFromMail(account.getMailAddress());
         currentAccount.setMailAddress(account.getMailAddress());
         currentAccount.setFirstName(account.getFirstName());

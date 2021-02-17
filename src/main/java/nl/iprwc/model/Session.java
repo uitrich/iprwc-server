@@ -39,6 +39,7 @@ public class Session {
     public Account getAccount() {
         return account;
     }
+    public void setAccount(Account account) { this.account = account; }
 
     public String getSessionKey() {
         return sessionKey;

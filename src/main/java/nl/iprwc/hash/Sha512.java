@@ -1,6 +1,6 @@
 package nl.iprwc.hash;
 
-import nl.iprwc.Utils.ArrayUtils;
+import nl.iprwc.utils.ArrayUtils;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;

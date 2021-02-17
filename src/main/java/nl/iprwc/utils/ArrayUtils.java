@@ -1,4 +1,4 @@
-package nl.iprwc.Utils;
+package nl.iprwc.utils;
 
 import java.util.ArrayList;
 import java.util.Arrays;

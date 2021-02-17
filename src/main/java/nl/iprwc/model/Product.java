@@ -1,24 +1,13 @@
 package nl.iprwc.model;
 
-import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonView;
-import nl.iprwc.Utils.BaseImageTranslator;
-import nl.iprwc.view.View;
-import org.joda.time.DateTime;
-
-import javax.ws.rs.Produces;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.util.List;
 
 public class Product {
     //name,price,body_location,category,company,id,image
     private String name;
     private double price;
-    private int body_location;
+    private int bodyLocation;
     private int category;
     private int company;
     private long id;
@@ -27,7 +16,7 @@ public class Product {
     public Product(String name, double price, long body_location, long category, long company, long id, String image) {
         this.name = name;
         this.price = price == 0.00 ? 10.00 : price;
-        this.body_location = Math.toIntExact(body_location);
+        this.bodyLocation = Math.toIntExact(body_location);
         this.category = Math.toIntExact(category);
         this.company = Math.toIntExact(company);
         this.id = id;
@@ -36,7 +25,7 @@ public class Product {
     public Product(String name, double price, int body_location, int category, int company, String image) {
         this.name = name;
         this.price = price == 0.00 ? 10.00 : price;
-        this.body_location = body_location;
+        this.bodyLocation = body_location;
         this.category = category;
         this.company = company;
         this.image = image;
@@ -74,12 +63,12 @@ public class Product {
         this.category = category;
     }
     @JsonProperty
-    public int getBody_location() {
-        return body_location;
+    public int getBodyLocation() {
+        return bodyLocation;
     }
 
-    public void setBody_location(int body_location) {
-        this.body_location = body_location;
+    public void setBodyLocation(int bodyLocation) {
+        this.bodyLocation = bodyLocation;
     }
     @JsonProperty
     public double getPrice() {
@@ -102,7 +91,7 @@ public class Product {
         if (product.name == null) product.name = this.name;
         if (product.company == 0) product.company = this.company;
         if (product.category == 0) product.category = this.category;
-        if (product.body_location == 0) product.body_location = this.body_location;
+        if (product.bodyLocation == 0) product.bodyLocation = this.bodyLocation;
         if (product.image == null) product.image = this.image;
         if (product.price == 0) product.price = this.price;
         return product;

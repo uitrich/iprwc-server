@@ -1,4 +1,4 @@
-package nl.iprwc.Utils;
+package nl.iprwc.utils;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
@@ -9,10 +9,6 @@ import java.awt.image.FilteredImageSource;
 import java.awt.image.ImageFilter;
 import java.awt.image.ImageProducer;
 import java.awt.image.RGBImageFilter;
-import java.io.File;
-import javax.imageio.ImageIO;
-
-import static java.lang.System.out;
 
 /**
  * Class containing code for converting an image's white background to be

@@ -2,6 +2,7 @@ package nl.iprwc.controller;
 
 import nl.iprwc.Request.CredentialsRequest;
 import nl.iprwc.Response.SessionStateResponse;
+import nl.iprwc.exception.InvalidOperationException;
 import nl.iprwc.exception.NotFoundException;
 import nl.iprwc.hash.BCrypt;
 import nl.iprwc.model.Account;
@@ -30,35 +31,18 @@ public class AuthenticationController {
     }
 
 
-    public Session logIn(CredentialsRequest authentication)
-    {
-        Account account;
-
-        try {
-            account = accountController.fromMailAddress(authentication.getMailAddress());
-        }
-        catch (Throwable e) { // NotFoundException
-            return null;
-        }
-
-        BCrypt bCrypt = new BCrypt();
-        boolean bcryptresult = bCrypt.verifyHash(authentication.getPassword(), account.getPasswordHash());
-        System.out.println(bcryptresult);
-        if (!bcryptresult) {
+    public Session logIn(CredentialsRequest authentication) throws InvalidOperationException {
+        Account account = accountController.fromMailAddress(authentication.getMailAddress());
+        if (!new BCrypt().verifyHash(authentication.getPassword(), account.getPasswordHash())) {
             return null;
         }
 
         return sessionController.create(account);
     }
 
-    public void logOut(String sessionKey)
-    {
-        try {
-            Session session = sessionController.fromSessionKey(sessionKey);
-            sessionController.delete(session);
-        } catch (NotFoundException e) {
-            // do nothing
-        }
+    public void logOut(String sessionKey) throws NotFoundException, InvalidOperationException {
+        Session session = sessionController.fromSessionKey(sessionKey);
+        sessionController.delete(session);
     }
 
     /**
@@ -66,17 +50,12 @@ public class AuthenticationController {
      * @param sessionKey
      * @return
      */
-    public SessionStateResponse getSessionState(String sessionKey)
-    {
-        try {
-            Session session = sessionController.fromSessionKey(sessionKey);
-            return new SessionStateResponse(session);
-        } catch (NotFoundException e) {
-            return new SessionStateResponse(false);
-        }
+    public SessionStateResponse getSessionState(String sessionKey) throws NotFoundException, InvalidOperationException {
+        Session session = sessionController.fromSessionKey(sessionKey);
+        return new SessionStateResponse(session);
     }
 
-    public void updateSession(String sessionKey) throws NotFoundException {
+    public void updateSession(String sessionKey) throws NotFoundException, InvalidOperationException {
         Session session = sessionController.fromSessionKey(sessionKey);
         sessionController.updateLastActivity(session);
     }

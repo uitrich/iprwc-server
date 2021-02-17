@@ -2,6 +2,7 @@ package nl.iprwc.core;
 
 import nl.iprwc.controller.SessionController;
 import nl.iprwc.controller.UserController;
+import nl.iprwc.exception.InvalidOperationException;
 import nl.iprwc.exception.NotFoundException;
 import nl.iprwc.model.Session;
 import nl.iprwc.model.User;
@@ -44,7 +45,7 @@ public class AccountAuthorizationFilter implements ContainerRequestFilter {
                 requestContext.setSecurityContext(securityContext);
                 return;
             }
-            catch (NotFoundException e) {
+            catch (NotFoundException | InvalidOperationException e) {
                 // do nothing
             }
         }

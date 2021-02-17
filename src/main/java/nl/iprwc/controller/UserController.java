@@ -12,21 +12,12 @@ public class UserController {
 
         return instance;
     }
-    private UserController() {    }
-    /**
-     * Make a new user model based on account.
-     * @param account
-     * @return
-     */
+    private UserController() {}
+
     public User fromAccount(Account account)
     {
         return new User(account);
     }
-
-    /**
-     * The the user if it's not logged in.
-     * @return
-     */
     public User getAnonymousUser()
     {
         return new User();

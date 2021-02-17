@@ -1,8 +1,8 @@
 package nl.iprwc.db;
 
 
-import nl.iprwc.Utils.JodaDateTime;
-import nl.iprwc.controller.AccountController;
+import nl.iprwc.utils.JodaDateTime;
+import nl.iprwc.exception.InvalidOperationException;
 import nl.iprwc.exception.NotFoundException;
 import nl.iprwc.model.Account;
 import nl.iprwc.model.Session;
@@ -15,38 +15,32 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public class SessionDAO {
-    public Session fromId(long id) throws NotFoundException {
-        try {
-            ResultSet result = DatabaseService
-                    .getInstance()
-                    .createNamedPreparedStatement(
-                            "SELECT account_id, session_key, last_activity FROM session WHERE id = :id")
-                    .setParameter("id", id)
-                    .executeQuery();
+    public Session fromId(long id) throws NotFoundException, SQLException, ClassNotFoundException, InvalidOperationException {
+        ResultSet result = DatabaseService
+                .getInstance()
+                .createNamedPreparedStatement(
+                        "SELECT account_id, session_key, last_activity FROM session WHERE id = :id")
+                .setParameter("id", id)
+                .executeQuery();
 
-            if (!result.next()) {
-                throw new NotFoundException();
-            }
-
-            return new Session(
-                    id,
-                    AccountController.getInstance().getFromId(result.getString("account_id")),
-                    result.getString("session_key"),
-                    JodaDateTime.fromTimestamp(result.getTimestamp("last_activity")));
+        if (!result.next()) {
+            throw new NotFoundException();
         }
-        catch (SQLException | ClassNotFoundException e) {
-            e.printStackTrace();
-        }
-
-        return null;
+//AccountController.getInstance().getFromId(result.getString("account_id"))
+        Account account = new Account();
+        account.setId(result.getString("account_id"));
+        return new Session(
+                id,
+                account,
+                result.getString("session_key"),
+                JodaDateTime.fromTimestamp(result.getTimestamp("last_activity")));
     }
 
-    public Session fromHashedSessionKey(String key) throws NotFoundException {
+    public Session fromHashedSessionKey(String key) throws NotFoundException, InvalidOperationException, SQLException, ClassNotFoundException {
         return fromHashedSessionKey(key, null);
     }
 
-    public Session fromHashedSessionKey(String key, String plainKey) throws NotFoundException {
-        try {
+    public Session fromHashedSessionKey(String key, String plainKey) throws NotFoundException, SQLException, ClassNotFoundException, InvalidOperationException {
             ResultSet result = DatabaseService
                     .getInstance()
                     .createNamedPreparedStatement(
@@ -58,19 +52,14 @@ public class SessionDAO {
                 throw new NotFoundException();
             }
 
-
-            return new Session(
-                    result.getLong("id"),
-                    AccountController.getInstance().getFromId(result.getString("account_id")),
-                    key,
-                    plainKey,
-                    JodaDateTime.fromTimestamp(result.getTimestamp("last_activity")));
-        }
-        catch (SQLException | ClassNotFoundException e) {
-            e.printStackTrace();
-        }
-
-        return null;
+        Account account = new Account();
+        account.setId(result.getString("account_id"));
+        return new Session(
+                result.getLong("id"),
+                account,
+                key,
+                plainKey,
+                JodaDateTime.fromTimestamp(result.getTimestamp("last_activity")));
     }
 
     public void delete(long id)

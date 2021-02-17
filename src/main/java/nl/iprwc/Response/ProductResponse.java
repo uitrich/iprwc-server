@@ -1,36 +1,41 @@
 package nl.iprwc.model;
 
-import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonView;
-import nl.iprwc.Utils.BaseImageTranslator;
-import nl.iprwc.view.View;
-import org.antlr.stringtemplate.language.Cat;
-import org.joda.time.DateTime;
+import nl.iprwc.utils.BaseImageTranslator;
+import nl.iprwc.controller.BodyLocationController;
+import nl.iprwc.controller.CategoryController;
+import nl.iprwc.controller.CompanyController;
+import nl.iprwc.exception.InvalidOperationException;
+import nl.iprwc.exception.NotFoundException;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.List;
 
 public class ProductResponse {
     //name,price,body_location,category,company,id,image
     private String name;
     private double price;
-    private Body_Location body_location;
+    private BodyLocation body_location;
     private Category category;
     private Company company;
     private long id;
     private String image;
 
-    public ProductResponse(String name, double price, Body_Location body_location, Category category, Company company, long id, String image) {
+    public static ProductResponse CreateFromProduct(Product p) throws NotFoundException, InvalidOperationException {
+        return new ProductResponse(
+                p.getName(),
+                p.getPrice(),
+                BodyLocationController.getInstance().get(p.getBodyLocation()),
+                CategoryController.getInstance().get(p.getCategory()),
+                CompanyController.getInstance().get(p.getCompany()),
+                p.getId(),
+                p.getImage());
+    }
+
+    public ProductResponse(String name, double price, BodyLocation bodyLocation, Category category, Company company, long id, String image) {
         this.name = name;
         this.price = price == 0.00 ? 10.00 : price;
-        this.body_location = body_location;
+        this.body_location = bodyLocation;
         this.category = category;
         this.company = company;
         this.id = id;
@@ -72,11 +77,11 @@ public class ProductResponse {
         this.category = category;
     }
     @JsonProperty
-    public Body_Location getBody_location() {
+    public BodyLocation getBody_location() {
         return body_location;
     }
 
-    public void setBody_location(Body_Location body_location) {
+    public void setBody_location(BodyLocation body_location) {
         this.body_location = body_location;
     }
     @JsonProperty

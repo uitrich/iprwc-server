@@ -1,6 +1,5 @@
-package nl.iprwc.Utils;
+package nl.iprwc.utils;
 
-import javax.ws.rs.core.Cookie;
 import javax.ws.rs.core.NewCookie;
 
 public class SetCookie extends NewCookie {

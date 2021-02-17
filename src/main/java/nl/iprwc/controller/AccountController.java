@@ -3,6 +3,7 @@ package nl.iprwc.controller;
 import com.sun.media.sound.InvalidDataException;
 import nl.iprwc.Request.AccountRequest;
 import nl.iprwc.db.AccountDAO;
+import nl.iprwc.exception.InvalidOperationException;
 import nl.iprwc.exception.NotFoundException;
 import nl.iprwc.groups.GroupService;
 import nl.iprwc.hash.BCrypt;
@@ -27,57 +28,78 @@ public class AccountController {
         dao = new AccountDAO();
     }
 
-    public Account getFromId(String id) {
-        return dao.getFromId(id);
+    public Account getFromId(String id) throws InvalidOperationException {
+        try {
+            return dao.getFromId(id);
+        } catch (SQLException | ClassNotFoundException e) {
+            throw new InvalidOperationException();
+        }
     }
-    public Account tryLogin(Authentication auth) throws SQLException, ClassNotFoundException {
-        return dao.tryLogin(auth.getMailAddress(), auth.getPassword());
+    public Account tryLogin(Authentication auth) throws InvalidOperationException {
+        try {
+            return dao.tryLogin(auth.getMailAddress(), auth.getPassword());
+        } catch (SQLException | ClassNotFoundException e) {
+            throw new InvalidOperationException();
+        }
     }
 
-    public boolean makeAccount(Authentication value) {
-        return dao.makeAccount(value);
+    public Account fromMailAddress(String mailAddress) throws InvalidOperationException {
+        try {
+            return dao.getAccountFromMail(mailAddress);
+        } catch (SQLException | ClassNotFoundException e) {
+            throw new InvalidOperationException();
+        }
     }
 
-    public Account fromMailAddress(String mailAddress) {
-        return dao.getAccountFromMail(mailAddress);
-    }
+    public Account create(AccountRequest account) throws InvalidOperationException {
 
-    public Account create(AccountRequest account) throws InvalidDataException, SQLException, NotFoundException, ClassNotFoundException  {
+        try {
             account.setPassword(new BCrypt().hash(account.getPassword()));
 
-            String generatedKey = dao.create(account);
+            String generatedKey = null;
+            generatedKey = dao.create(account);
 
             Account generatedAccount;
-            if(generatedKey != null){
+            if (generatedKey != null) {
                 generatedAccount = getFromId(generatedKey);
 
                 long groupId = 1;
                 String internalReference = null;
                 internalReference = GroupService.getInstance().fromRawId(groupId).getInternalReference();
 
-                if(dao.addGroupToAccount(generatedAccount, internalReference)){
+                if (dao.addGroupToAccount(generatedAccount, internalReference)) {
                     return getFromId(generatedAccount.getId());
                 }
-            }else{
-                throw new InternalServerErrorException("Something went wrong creating the account");
             }
-            return null;
+            throw new InvalidOperationException();
+        } catch (ClassNotFoundException | SQLException e) {
+            throw new InvalidOperationException();
+        }
     }
 
-    public Account updateAccount(Account account){
-        return dao.updateAccount(account);
-    }
-    public void UpdateAccountId(String oldId) throws SQLException, ClassNotFoundException {
-        dao.UpdateId(oldId, UUID.randomUUID().toString());
-    }
-
-    public boolean deleteAccount(String account) {
-        ShoppingCartController.getInstance().delete(account);
-        GroupController.getInstance().deleteAccountGroup(account);
-        return dao.delete(account);
+    public Account updateAccount(Account account) throws InvalidOperationException {
+        try {
+            return dao.updateAccount(account);
+        } catch (SQLException | ClassNotFoundException e) {
+            throw new InvalidOperationException();
+        }
     }
 
-    public List<Account> getAll() throws SQLException, ClassNotFoundException {
-        return dao.getAll();
+    public boolean deleteAccount(String account) throws InvalidOperationException {
+        try {
+            ShoppingCartController.getInstance().delete(account);
+            GroupController.getInstance().deleteAccountGroup(account);
+            return dao.delete(account);
+        } catch (SQLException | ClassNotFoundException e) {
+            throw new InvalidOperationException();
+        }
+    }
+
+    public List<Account> getAll() throws InvalidOperationException {
+        try {
+            return dao.getAll();
+        } catch (SQLException | ClassNotFoundException e) {
+            throw new InvalidOperationException();
+        }
     }
 }

@@ -3,11 +3,11 @@ package nl.iprwc.model;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class Body_Location {
+public class BodyLocation {
     private long id;
     private String name;
 
-    public Body_Location(long id, String name) {
+    public BodyLocation(long id, String name) {
         this.id = id;
         this.name = name;
     }
