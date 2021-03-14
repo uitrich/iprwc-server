@@ -3,7 +3,6 @@ package nl.iprwc.db;
 import nl.iprwc.Request.AccountRequest;
 import nl.iprwc.groups.GroupService;
 import nl.iprwc.model.Account;
-import nl.iprwc.model.Authentication;
 import nl.iprwc.model.Group;
 import nl.iprwc.sql.DatabaseService;
 import nl.iprwc.sql.NamedParameterStatement;
@@ -182,8 +181,8 @@ public class AccountDAO {
                     .setParameter("password", account.getPasswordHash())
                     .setParameter("firstname", account.getFirstName())
                     .setParameter("lastname", account.getLastName())
-                    .setParameter("postalCode", account.getPostal_code())
-                    .setParameter("house_number", account.getHouse_number())
+                    .setParameter("postalCode", account.getPostalCode())
+                    .setParameter("house_number", account.getHouseNumber())
                     .setParameter("id", account.getId());
             if(statement.executeUpdate() == 0){
                 throw new NotFoundException();
@@ -228,8 +227,8 @@ public class AccountDAO {
         currentAccount.setMailAddress(account.getMailAddress());
         currentAccount.setFirstName(account.getFirstName());
         currentAccount.setLastName(account.getLastName());
-        currentAccount.setPostal_code(account.getPostal_code());
-        currentAccount.setHouse_number(account.getHouse_number());
+        currentAccount.setPostalCode(account.getPostalCode());
+        currentAccount.setHouseNumber(account.getHouseNumber());
         return currentAccount;
     }
 }

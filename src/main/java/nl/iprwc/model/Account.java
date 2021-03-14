@@ -3,12 +3,10 @@ package nl.iprwc.model;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonView;
-import nl.iprwc.constraints.Validator;
 import nl.iprwc.view.View;
 
 import javax.persistence.Entity;
 import javax.persistence.Table;
-import javax.validation.constraints.NotNull;
 import java.util.*;
 
 @Entity
@@ -20,8 +18,8 @@ public class Account {
     private String passwordHash;
     private String firstName;
     private String lastName;
-    private String postal_code;
-    private String house_number;
+    private String postalCode;
+    private String houseNumber;
     private List<Group> groups;
     private String reference;
 
@@ -31,13 +29,13 @@ public class Account {
         this.lastName = null;
         this.mailAddress = null;
         this.passwordHash = null;
-        this.postal_code = null;
-        this.house_number = null;
+        this.postalCode = null;
+        this.houseNumber = null;
         this.groups = new ArrayList<>();
         this.reference = "";
     }
 
-    public Account(String id, String firstName, String lastName, String mailAddress, String postal_code, String house_number, String passwordHash, String reference) {
+    public Account(String id, String firstName, String lastName, String mailAddress, String postalCode, String houseNumber, String passwordHash, String reference) {
 
         this.id = id;
         this.firstName = firstName;
@@ -46,16 +44,16 @@ public class Account {
         this.passwordHash = passwordHash;
         this.groups = new ArrayList<>();
         this.reference = reference;
-        this.postal_code = postal_code;
-        this.house_number = house_number;
+        this.postalCode = postalCode;
+        this.houseNumber = houseNumber;
     }
 
-    public Account(String firstName, String lastName, String mailAddress, String postal_code, String house_number) {
+    public Account(String firstName, String lastName, String mailAddress, String postalCode, String houseNumber) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.mailAddress = mailAddress.toLowerCase();
-        this.postal_code = postal_code;
-        this.house_number = house_number;
+        this.postalCode = postalCode;
+        this.houseNumber = houseNumber;
     }
 
     public Account(String firstName, String lastName, String mailAddress, String passwordHash) {
@@ -66,8 +64,8 @@ public class Account {
         this.passwordHash = passwordHash;
         this.groups = new ArrayList<Group>();
         this.reference = "";
-        this.house_number = "1a";
-        this.postal_code = "1234";
+        this.houseNumber = "1a";
+        this.postalCode = "1234";
     }
 
 
@@ -210,20 +208,20 @@ public class Account {
 
     @JsonView(View.Public.class)
     @JsonProperty
-    public String getPostal_code() {
-        return postal_code;
+    public String getPostalCode() {
+        return postalCode;
     }
     @JsonIgnore
-    public void setPostal_code(String postal_code) {
-        this.postal_code = postal_code;
+    public void setPostalCode(String postalCode) {
+        this.postalCode = postalCode;
     }
     @JsonView(View.Public.class)
     @JsonProperty
-    public String getHouse_number() {
-        return house_number;
+    public String getHouseNumber() {
+        return houseNumber;
     }
     @JsonIgnore
-    public void setHouse_number(String house_number) {
-        this.house_number = house_number;
+    public void setHouseNumber(String houseNumber) {
+        this.houseNumber = houseNumber;
     }
 }
