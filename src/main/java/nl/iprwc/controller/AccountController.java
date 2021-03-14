@@ -4,12 +4,12 @@ import com.sun.media.sound.InvalidDataException;
 import nl.iprwc.Request.AccountRequest;
 import nl.iprwc.db.AccountDAO;
 import nl.iprwc.exception.InvalidOperationException;
-import nl.iprwc.exception.NotFoundException;
 import nl.iprwc.groups.GroupService;
 import nl.iprwc.hash.BCrypt;
 import nl.iprwc.model.*;
 
 import javax.ws.rs.InternalServerErrorException;
+import javax.ws.rs.NotFoundException;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.UUID;
@@ -52,7 +52,12 @@ public class AccountController {
     }
 
     public Account create(AccountRequest account) throws InvalidOperationException {
-
+        try {
+            fromMailAddress(account.getMailAddress());
+            throw new InvalidOperationException();
+        } catch (NotFoundException e) {
+            //ignore
+        }
         try {
             account.setPassword(new BCrypt().hash(account.getPassword()));
 

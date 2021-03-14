@@ -154,7 +154,7 @@ public class AccountDAO {
 
     }
 
-    public Account getAccountFromMail(String mail) throws SQLException, ClassNotFoundException {
+    public Account getAccountFromMail(String mail) throws SQLException, ClassNotFoundException, NotFoundException {
             NamedParameterStatement statement = DatabaseService.getInstance()
                     .createNamedPreparedStatement("SELECT * FROM account WHERE mailaddress = :mailaddress");
             statement.setParameter("mailaddress", mail);
@@ -163,7 +163,7 @@ public class AccountDAO {
             account = fromResultSet(result);
             if (account != null) return account;
         //return Optional.of(get(id));
-        throw new NullPointerException();
+        throw new NotFoundException();
     }
 
     public Account updateAccount(Account account) throws SQLException, ClassNotFoundException {

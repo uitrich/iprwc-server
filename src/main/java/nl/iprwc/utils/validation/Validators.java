@@ -77,27 +77,6 @@ public class Validators {
                         Pattern.CASE_INSENSITIVE)
                 .build());
 
-        register("category", Validator
-                .builder()
-                .minimumLength(3)
-                .maximumLength(50)
-                .matches("[a-zA-Z0-9][\\w\\s-]*[a-zA-Z0-9]")
-                .build());
-
-        register("website", Validator
-                .builder()
-                .notEmpty()
-                .maximumLength(2048)
-                .matches("(https?://)([a-zA-Z0-9]+(-?[a-zA-Z0-9])*\\.)+[\\w]{2,}(/\\S*)?")
-                .build());
-
-        register("reference", Validator
-                .builder()
-                .notEmpty()
-                .maximumLength(50)
-                .matches("[\\w-]+")
-                .build());
-
         register("name", Validator
                 .builder()
                 .minimumLength(2)
