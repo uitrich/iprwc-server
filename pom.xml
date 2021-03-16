@@ -181,9 +181,6 @@
                         </goals>
                     </execution>
                 </executions>
-                <configuration>
-                    <javadocExecutable>${java.home}/bin/javadoc</javadocExecutable>
-                </configuration>
             </plugin>
             <plugin>
                 <artifactId>maven-site-plugin</artifactId>
