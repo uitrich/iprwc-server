@@ -11,6 +11,10 @@ public class Company {
         this.id = id;
         this.name = name;
     }
+    public Company() {
+        this.id = 0;
+        this.name = "";
+    }
 
     @JsonProperty
     public String getName() {

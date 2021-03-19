@@ -276,6 +276,17 @@ public class NamedParameterStatement {
         return statement.execute();
     }
 
+    /**
+     * Executes the statement as per ExecuteUpdate()
+     * and then returns generated keys as per getGeneratedKeys()
+     * @return the values as per getGeneratedKeys()
+     * @throws SQLException if an error occurred
+     */
+    public ResultSet executeGetReturning() throws SQLException {
+        executeUpdate();
+        return getGeneratedKeys();
+    }
+
 
     /**
      * Executes the statement, which must be a query.

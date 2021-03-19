@@ -11,6 +11,10 @@ public class BodyLocation {
         this.id = id;
         this.name = name;
     }
+    public BodyLocation() {
+        this.id = 0;
+        this.name = "";
+    }
 
     @JsonProperty
     public String getName() {

@@ -136,7 +136,6 @@ public class BaseImageTranslator {
             baos.write(buffer, 0, read);
         }
         baos.flush();
-        System.out.println("Ive got an url");
         return baos.toByteArray();
     }
 

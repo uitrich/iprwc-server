@@ -1,7 +1,12 @@
-package nl.iprwc.model;
+package nl.iprwc.Response;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import nl.iprwc.model.BodyLocation;
+import nl.iprwc.model.Category;
+import nl.iprwc.model.Company;
+import nl.iprwc.model.Product;
+import nl.iprwc.resources.ProductResource;
 import nl.iprwc.utils.BaseImageTranslator;
 import nl.iprwc.controller.BodyLocationController;
 import nl.iprwc.controller.CategoryController;
@@ -43,6 +48,15 @@ public class ProductResponse {
         try {new URL(image); this.image = "data:image/jpg;base64," + BaseImageTranslator.getBase64URL(image);} catch (Exception e) {
             //ignore
         }
+    }
+    public ProductResponse() {
+        this.name = "";
+        this.bodyLocation = new BodyLocation(0, "");
+        this.category = new Category(0, "");
+        this.company = new Company(0, "");
+        this.id = 0;
+        this.image = "";
+        this.price = 0;
     }
     @JsonProperty
     public String getImage() {

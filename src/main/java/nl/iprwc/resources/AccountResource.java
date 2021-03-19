@@ -2,8 +2,6 @@ package nl.iprwc.resources;
 
 
 import com.fasterxml.jackson.annotation.JsonView;
-import com.google.gson.Gson;
-import com.google.gson.JsonObject;
 import com.sun.media.sound.InvalidDataException;
 import io.dropwizard.auth.Auth;
 import nl.iprwc.Request.AccountRequest;

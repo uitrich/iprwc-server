@@ -1,13 +1,13 @@
 package nl.iprwc.controller;
 
 import io.dropwizard.jersey.params.LongParam;
+import nl.iprwc.Response.ProductResponse;
 import nl.iprwc.utils.BaseImageTranslator;
 import nl.iprwc.utils.Paginated;
 import nl.iprwc.db.ProductDAO;
 import nl.iprwc.exception.InvalidOperationException;
 import nl.iprwc.exception.NotFoundException;
 import nl.iprwc.model.Product;
-import nl.iprwc.model.ProductResponse;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -34,6 +34,7 @@ public class ProductController {
 
     public ProductResponse getFromId(long id) throws InvalidOperationException, NotFoundException {
         try {
+            addView(id);
             return ProductResponse.CreateFromProduct(dao.getSingle(id));
         } catch (SQLException | ClassNotFoundException e) {
             throw new InvalidOperationException();
@@ -62,6 +63,7 @@ public class ProductController {
         try {
             return dao.getMultiple(0, 0, company, category, bodyLocation, search,  page, pageSize);
         } catch (SQLException | ClassNotFoundException e) {
+            e.printStackTrace();
             throw new InvalidOperationException();
         }
     }
@@ -86,7 +88,7 @@ public class ProductController {
         return populateProductList(input);
     }
 
-    public Product insertAdd(ProductResponse input) throws InvalidOperationException, nl.iprwc.exception.NotFoundException {
+    public ProductResponse insertAdd(ProductResponse input) throws InvalidOperationException, nl.iprwc.exception.NotFoundException {
         Product product = splitResponse(input);
         String image = product.getImage();
         try {
@@ -100,8 +102,9 @@ public class ProductController {
         else if (product.getBodyLocation() == 0 ) { System.out.println("body location has 0, aborting.."); }
         else {
             try {
-                return dao.insert(product);
+                return ProductResponse.CreateFromProduct(dao.insert(product));
             } catch (SQLException | ClassNotFoundException e) {
+                e.printStackTrace();
                 throw new InvalidOperationException();
             }
         }
@@ -175,5 +178,7 @@ public class ProductController {
         }
         return output;
     }
-
+    private void addView(long productId) throws SQLException, ClassNotFoundException {
+        dao.addView(productId);
+    }
 }

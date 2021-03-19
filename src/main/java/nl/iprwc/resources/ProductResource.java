@@ -1,15 +1,14 @@
 package nl.iprwc.resources;
 
 
-import com.google.gson.Gson;
 import io.dropwizard.auth.Auth;
 import io.dropwizard.jersey.params.LongParam;
+import nl.iprwc.Response.ProductResponse;
 import nl.iprwc.controller.GroupController;
 import nl.iprwc.controller.ProductController;
 import nl.iprwc.exception.InvalidOperationException;
 import nl.iprwc.exception.NotFoundException;
 import nl.iprwc.model.Product;
-import nl.iprwc.model.ProductResponse;
 import nl.iprwc.model.User;
 
 import javax.annotation.security.RolesAllowed;
@@ -30,13 +29,11 @@ public class ProductResource {
     private static final String SORT_REGEX = "^(asc|desc)\\-(.+)$";
     private static final int SORT_REGEX_FLAGS = Pattern.CASE_INSENSITIVE;
     private static final Pattern SORT_PATTERN = Pattern.compile(SORT_REGEX, SORT_REGEX_FLAGS);
-    private static Gson gson;
 
     private final ProductController controller;
 
     public ProductResource() {
         this.controller = ProductController.getInstance();
-        gson = new Gson();
     }
 
     @GET
@@ -84,16 +81,14 @@ public class ProductResource {
     @POST
     @RolesAllowed("Role_Admin")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response addProduct(String json) throws InvalidOperationException, NotFoundException {
-        ProductResponse product = gson.fromJson(json, ProductResponse.class);
+    public Response addProduct(ProductResponse product) throws InvalidOperationException, NotFoundException {
         return Response.status(Response.Status.OK).entity(controller.insertAdd(product)).build();
     }
 
     @PUT
     @RolesAllowed("Role_Admin")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response updateProduct(String json) throws InvalidOperationException, NotFoundException {
-        ProductResponse product = gson.fromJson(json, ProductResponse.class);
+    public Response updateProduct(ProductResponse product) throws InvalidOperationException, NotFoundException {
         return Response.status(Response.Status.OK).entity(controller.update(controller.splitResponse(product))).build();
     }
 

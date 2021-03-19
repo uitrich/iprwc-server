@@ -1,13 +1,13 @@
 package nl.iprwc.db;
 
 import io.dropwizard.jersey.params.LongParam;
+import nl.iprwc.Response.ProductResponse;
 import nl.iprwc.utils.BaseImageTranslator;
 import nl.iprwc.utils.Paginated;
 import nl.iprwc.controller.ProductController;
 import nl.iprwc.exception.InvalidOperationException;
 import nl.iprwc.exception.NotFoundException;
 import nl.iprwc.model.*;
-import nl.iprwc.model.ProductResponse;
 import nl.iprwc.sql.DatabaseService;
 import nl.iprwc.sql.NamedParameterStatement;
 
@@ -69,7 +69,6 @@ public class ProductDAO {
         }
 
         for (int i = 0; i < company.size(); i++) {
-            if (company.get(i) > 46) company.set(i, company.get(i) -1);
             if (i < company.size() -1) queryContents += "company  = :company" + i + " OR ";
             else queryContents += bodyLocation.size() != 0 && categories.size() != 0 ? "company = :company" + i + ") AND (" : "company = :company" + i + ")";
         }
@@ -81,7 +80,6 @@ public class ProductDAO {
         queryContents += !(search == null) ? "name LIKE :search) " : " ";
         String countContent = queryContents;
         String end = "ORDER BY id LIMIT :pagesize OFFSET :page";
-        System.out.println(queryContents);
         NamedParameterStatement query = initQuery(initialString, queryContents, end, pageSize, page);
         query = populatePreparedStatementWithFilters(query, search, categories, company, bodyLocation);
         List<Product> result = fromResultSets(query.executeQuery());
@@ -158,32 +156,33 @@ public class ProductDAO {
                     .setParameter("body_location", product.getBodyLocation())
                     .setParameter("company", product.getCompany())
                     .setParameter("image", image);
-            System.out.println(resultkey.getStatement());
             return resultkey.execute();
     }
 
     public List<Product> getTop(long range) throws NotFoundException, SQLException, ClassNotFoundException {
         ResultSet top = DatabaseService.getInstance().createNamedPreparedStatement(
-                "SELECT " +
-                        "product.name, product.price, product.body_location, product.category, product.company, product.id, product.image " +
-                        "FROM product " +
-                        "JOIN product_stats ps on product.id = ps.product_id Group by product.name, product.price, product.body_location, product.category, product.company, product.id, product.image, ps.views ORDER BY ps.views LIMIT :range OFFSET 0 ")
-                .setParameter("range", range)
+        "select ps.product_id as id, p.name, p.price, p.body_location, p.image, p.category, p.company from product_stats ps " +
+                "join product p on ps.product_id=p.id " +
+                "order by views desc " +
+                "offset 0 " +
+                "limit :range") .setParameter("range", range)
                 .executeQuery();
         return (fromResultSets(top));
     }
 
     public Product insert(Product product) throws SQLException, ClassNotFoundException {
         try {new URL(product.getImage()); product.setImage(BaseImageTranslator.getBase64URL(product.getImage()));} catch (Exception ignore) {}
-            DatabaseService.getInstance()
-                    .createNamedPreparedStatement("INSERT INTO product (name, price, body_location, image, category, company) VALUES(:name, :price, :body_location, :image, :category, :company)")
-                    .setParameter("name", product.getName())
-                    .setParameter("price", product.getPrice())
-                    .setParameter("body_location", product.getBodyLocation())
-                    .setParameter("image", product.getBodyLocation())
-                    .setParameter("category", product.getCategory())
-                    .setParameter("company", product.getCompany())
-            .execute();
+        NamedParameterStatement namedParameterStatement = DatabaseService.getInstance()
+            .createNamedPreparedStatement("INSERT INTO product (name, price, body_location, image, category, company) VALUES(:name, :price, :body_location, :image, :category, :company)")
+            .setParameter("name", product.getName())
+            .setParameter("price", product.getPrice())
+            .setParameter("body_location", product.getBodyLocation())
+            .setParameter("image", product.getImage())
+            .setParameter("category", product.getCategory())
+            .setParameter("company", product.getCompany());
+        ResultSet rs = namedParameterStatement.executeGetReturning();
+        if (rs.next())
+            product.setId(rs.getLong("id"));
         return product;
     }
 
@@ -206,7 +205,7 @@ public class ProductDAO {
     }
 
     public List<Product> getAll() throws SQLException, ClassNotFoundException {
-        ResultSet res = DatabaseService.getInstance().createPreparedStatement("SELECT * FROM product")
+        ResultSet res = DatabaseService.getInstance().createPreparedStatement("SELECT * FROM product ORDER BY id")
                 .executeQuery();
         List<Product> productResponse = new ArrayList<>();
         while (res.next()) {
@@ -225,17 +224,9 @@ public class ProductDAO {
     }
 
     public void addView(long productId) throws SQLException, ClassNotFoundException {
-        DatabaseService.getInstance().createPreparedStatement(
-            "UPDATE product SET " +
-            "name = :name, " +
-            "id = :id, " +
-            "price = :price, " +
-            "category = :category, " +
-            "body_location = :body_location, " +
-            "company = :company, " +
-            "image = :image " +
-            "WHERE product_id = :productId"
-        );
+        DatabaseService.getInstance().createNamedPreparedStatement(
+            "UPDATE product_stats SET views = views + 1 WHERE product_id = :id"
+        ).setParameter("id", productId).executeUpdate();
     }
 }
 

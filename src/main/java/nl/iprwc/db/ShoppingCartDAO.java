@@ -3,7 +3,6 @@ package nl.iprwc.db;
 import nl.iprwc.controller.ProductController;
 import nl.iprwc.exception.NotFoundException;
 import nl.iprwc.model.Product;
-import nl.iprwc.model.ProductResponse;
 import nl.iprwc.model.User;
 import nl.iprwc.sql.DatabaseService;
 import nl.iprwc.sql.NamedParameterStatement;
