@@ -15,7 +15,7 @@ public class ProductResponse {
     //name,price,body_location,category,company,id,image
     private String name;
     private double price;
-    private BodyLocation body_location;
+    private BodyLocation bodyLocation;
     private Category category;
     private Company company;
     private long id;
@@ -35,7 +35,7 @@ public class ProductResponse {
     public ProductResponse(String name, double price, BodyLocation bodyLocation, Category category, Company company, long id, String image) {
         this.name = name;
         this.price = price == 0.00 ? 10.00 : price;
-        this.body_location = bodyLocation;
+        this.bodyLocation = bodyLocation;
         this.category = category;
         this.company = company;
         this.id = id;
@@ -77,12 +77,12 @@ public class ProductResponse {
         this.category = category;
     }
     @JsonProperty
-    public BodyLocation getBody_location() {
-        return body_location;
+    public BodyLocation getBodyLocation() {
+        return bodyLocation;
     }
 
-    public void setBody_location(BodyLocation body_location) {
-        this.body_location = body_location;
+    public void setBodyLocation(BodyLocation bodyLocation) {
+        this.bodyLocation = bodyLocation;
     }
     @JsonProperty
     public double getPrice() {

@@ -32,9 +32,9 @@ public class ProductController {
         dao = new ProductDAO();
     }
 
-    public Product getFromId(long id) throws InvalidOperationException {
+    public ProductResponse getFromId(long id) throws InvalidOperationException, NotFoundException {
         try {
-            return dao.getSingle(id);
+            return ProductResponse.CreateFromProduct(dao.getSingle(id));
         } catch (SQLException | ClassNotFoundException e) {
             throw new InvalidOperationException();
         }
@@ -127,7 +127,7 @@ public class ProductController {
     public Product splitResponse(ProductResponse product) throws InvalidOperationException, nl.iprwc.exception.NotFoundException {
         long catId = CategoryController.getInstance().createIfNotExists(product.getCategory());
         long comId = CompanyController.getInstance().createIfNotExists(product.getCompany());
-        long bodId = BodyLocationController.getInstance().createIfNotExists(product.getBody_location());
+        long bodId = BodyLocationController.getInstance().createIfNotExists(product.getBodyLocation());
 
         return new Product(product.getName(), product.getPrice(), bodId, catId, comId, product.getId(), product.getImage());
     }

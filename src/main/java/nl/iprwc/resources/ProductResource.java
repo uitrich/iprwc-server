@@ -63,10 +63,8 @@ public class ProductResource {
     @Path("/{id}")
     @Produces(MediaType.APPLICATION_JSON)
     @RolesAllowed("Role_Admin")
-    public Response getFromId(@PathParam("id") long id, @Auth User user) throws InvalidOperationException {
-        Product result = controller.getFromId(id);
-        return Response.status(Response.Status.OK).entity(result).build();
-
+    public Response getFromId(@PathParam("id") long id, @Auth User user) throws InvalidOperationException, NotFoundException {
+        return Response.status(Response.Status.OK).entity(controller.getFromId(id)).build();
     }
 
     @GET

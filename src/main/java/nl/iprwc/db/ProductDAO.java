@@ -163,15 +163,14 @@ public class ProductDAO {
     }
 
     public List<Product> getTop(long range) throws NotFoundException, SQLException, ClassNotFoundException {
-            ResultSet top = DatabaseService.getInstance().createNamedPreparedStatement(
-                    "SELECT " +
-                            "product.name, product.price, product.body_location, product.category, product.company, product.id, product.image " +
-                            "FROM product, product_stats " +
-                            "JOIN product p on id=product_id ORDER BY views LIMIT :range OFFSET 0 "
-            )
-                    .setParameter("range", range)
-                    .executeQuery();
-            return (fromResultSets(top));
+        ResultSet top = DatabaseService.getInstance().createNamedPreparedStatement(
+                "SELECT " +
+                        "product.name, product.price, product.body_location, product.category, product.company, product.id, product.image " +
+                        "FROM product " +
+                        "JOIN product_stats ps on product.id = ps.product_id Group by product.name, product.price, product.body_location, product.category, product.company, product.id, product.image, ps.views ORDER BY ps.views LIMIT :range OFFSET 0 ")
+                .setParameter("range", range)
+                .executeQuery();
+        return (fromResultSets(top));
     }
 
     public Product insert(Product product) throws SQLException, ClassNotFoundException {
