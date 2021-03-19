@@ -70,7 +70,7 @@ public class ShoppingCartResource {
     }
 
     @DELETE
-    @Path("full/{id}")
+    @Path("full")
     @RolesAllowed("Role_Customer")
     public Response deleteFull( @Auth User user) throws InvalidOperationException {
         controller.delete(user.getAccount().getId());

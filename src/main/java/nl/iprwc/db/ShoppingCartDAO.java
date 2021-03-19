@@ -6,6 +6,7 @@ import nl.iprwc.model.Product;
 import nl.iprwc.model.ProductResponse;
 import nl.iprwc.model.User;
 import nl.iprwc.sql.DatabaseService;
+import nl.iprwc.sql.NamedParameterStatement;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -15,13 +16,11 @@ import java.util.List;
 public class ShoppingCartDAO {
     ProductController productController = ProductController.getInstance();
     public void AddToCart(String accountId, long productId) throws SQLException, ClassNotFoundException, NotFoundException {
-        boolean result = DatabaseService.getInstance()
+        DatabaseService.getInstance()
                 .createNamedPreparedStatement("INSERT INTO shopping_cart (account_id, product_id) VALUES (:account_id, :product_id)")
                 .setParameter("account_id", accountId)
                 .setParameter("product_id", productId)
-        .execute();
-        if (!result)
-            throw new NotFoundException();
+                .execute();
     }
 
     public List<Long> getShoppingCartContents(String accountId) throws SQLException, ClassNotFoundException {
@@ -36,10 +35,10 @@ public class ShoppingCartDAO {
     }
 
     public void deleteItem(long id, String user) throws SQLException, ClassNotFoundException, NotFoundException {
-        if (!DatabaseService.getInstance().createNamedPreparedStatement("DELETE FROM shopping_cart WHERE product_id = :id AND account_id = :userId" )
+        DatabaseService.getInstance().createNamedPreparedStatement("DELETE FROM shopping_cart WHERE product_id = :id AND account_id = :userId" )
                 .setParameter("id", id)
                 .setParameter("userId", user)
-        .execute()) throw new NotFoundException();
+                .execute();
     }
 
     public void addQuantity(long productid, String id) throws SQLException, ClassNotFoundException, NotFoundException {
@@ -100,7 +99,7 @@ public class ShoppingCartDAO {
 
     public boolean deleteAccount(String id) throws SQLException, ClassNotFoundException {
         return DatabaseService.getInstance()
-                .createNamedPreparedStatement("DELETE FROM shoppingcart WHERE account_id = :id")
+                .createNamedPreparedStatement("DELETE FROM shopping_cart WHERE account_id = :id")
                 .setParameter("id", id)
                 .execute();
     }
