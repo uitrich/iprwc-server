@@ -51,16 +51,7 @@ public class ImageTransparancy
 
             public final int filterRGB(final int x, final int y, final int rgb)
             {
-                if ((rgb | 0xFF000000) == markerRGB)
-                {
-                    // Mark the alpha bits as zero - transparent
-                    return 0x00FFFFFF & rgb;
-                }
-                else
-                {
-                    // nothing to do
-                    return rgb;
-                }
+                return (rgb | 0xFF000000) == markerRGB ? 0x00FFFFFF & rgb : rgb;
             }
         };
 
