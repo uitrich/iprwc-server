@@ -1,6 +1,5 @@
 package nl.iprwc.controller;
 
-import nl.iprwc.db.BodyLocationDAO;
 import nl.iprwc.db.CompanyDAO;
 import nl.iprwc.exception.InvalidOperationException;
 import nl.iprwc.exception.NotFoundException;
@@ -47,9 +46,9 @@ public class CompanyController {
         }
     }
 
-    public long post(String name) throws InvalidOperationException {
+    public long create(String name) throws InvalidOperationException {
         try {
-            return dao.post(name);
+            return dao.create(name);
         } catch (SQLException | ClassNotFoundException e) {
             throw new InvalidOperationException();
         }
@@ -67,7 +66,7 @@ public class CompanyController {
         int id = exists(company.getName());
         if (id == 0) {
             try {
-                dao.post(company.getName());
+                dao.create(company.getName());
             } catch (SQLException | ClassNotFoundException e) {
                 throw new InvalidOperationException();
             }

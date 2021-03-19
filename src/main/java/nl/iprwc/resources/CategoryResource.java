@@ -37,8 +37,8 @@ public class CategoryResource {
     @POST
     @Produces(MediaType.APPLICATION_JSON)
     @RolesAllowed("Role_Admin")
-    public Response post(String name) throws InvalidOperationException {
-        controller.post(name);
+    public Response create(String name) throws InvalidOperationException {
+        controller.create(name);
         return Response.status(Response.Status.OK).build();
     }
 

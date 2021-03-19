@@ -38,8 +38,8 @@ public class BodyLocationResource {
     @POST
     @Produces(MediaType.APPLICATION_JSON)
     @RolesAllowed("Role_Admin")
-    public Response post(String name) throws InvalidOperationException {
-        return Response.status(Response.Status.OK).entity(controller.post(name)).build();
+    public Response create(String name) throws InvalidOperationException {
+        return Response.status(Response.Status.OK).entity(controller.create(name)).build();
     }
 
     @PUT

@@ -34,7 +34,7 @@ public class CompanyDAO {
     }
 
 
-    public long post(String name) throws SQLException, ClassNotFoundException {
+    public long create(String name) throws SQLException, ClassNotFoundException {
             return DatabaseService.getInstance()
                     .createNamedPreparedStatement("INSERT INTO company (name) VALUES (:name)")
                     .setParameter("name", name)

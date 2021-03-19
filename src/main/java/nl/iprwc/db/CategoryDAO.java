@@ -35,7 +35,7 @@ public class CategoryDAO {
         else throw new NotFoundException();
     }
 
-    public void post(String name) throws SQLException, ClassNotFoundException {
+    public void create(String name) throws SQLException, ClassNotFoundException {
         boolean result = !DatabaseService.getInstance()
                 .createNamedPreparedStatement("INSERT INTO category (name) VALUES (:name)")
                 .setParameter("name", name)

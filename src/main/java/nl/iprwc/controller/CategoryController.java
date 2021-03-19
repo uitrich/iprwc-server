@@ -1,6 +1,5 @@
 package nl.iprwc.controller;
 
-import nl.iprwc.db.BodyLocationDAO;
 import nl.iprwc.db.CategoryDAO;
 import nl.iprwc.exception.InvalidOperationException;
 import nl.iprwc.exception.NotFoundException;
@@ -56,9 +55,9 @@ public class CategoryController {
         }
     }
 
-    public void post(String name) throws InvalidOperationException {
+    public void create(String name) throws InvalidOperationException {
         try {
-            dao.post(name);
+            dao.create(name);
         } catch (SQLException | ClassNotFoundException e) {
             throw new InvalidOperationException();
         }
@@ -75,7 +74,7 @@ public class CategoryController {
     public long createIfNotExists(Category category) throws InvalidOperationException, NotFoundException {
         try {
             if (!exists(category.getName())) {
-                    dao.post(category.getName());
+                    dao.create(category.getName());
             }
             return dao.getByName(category.getName());
         } catch (SQLException | ClassNotFoundException e) {

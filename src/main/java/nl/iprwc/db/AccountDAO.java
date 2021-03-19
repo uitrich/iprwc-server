@@ -53,7 +53,7 @@ public class AccountDAO {
         Account account =  fromResultSet(
             DatabaseService
                     .getInstance()
-                    .createNamedPreparedStatement("SELECT * FROM Account WHERE username == :username && password == :password")
+                    .createNamedPreparedStatement("SELECT * FROM Account WHERE username == :username AND password == :password")
                     .setParameter("username", username)
                     .setParameter("password", password)
                     .executeQuery()

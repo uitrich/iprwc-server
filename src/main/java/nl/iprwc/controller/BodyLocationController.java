@@ -51,9 +51,9 @@ public class BodyLocationController {
         }
     }
 
-    public long post(String name) throws InvalidOperationException {
+    public long create(String name) throws InvalidOperationException {
         try {
-            return dao.post(name);
+            return dao.create(name);
         }  catch (SQLException | ClassNotFoundException e) {
             throw new InvalidOperationException();
         }
@@ -71,7 +71,7 @@ public class BodyLocationController {
         int id = exists(body_location.getName());
         if (id == 0) {
             try {
-                dao.post(body_location.getName());
+                dao.create(body_location.getName());
             } catch (SQLException | ClassNotFoundException e) {
                 throw new InvalidOperationException();
             }

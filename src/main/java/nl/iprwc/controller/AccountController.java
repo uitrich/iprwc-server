@@ -53,7 +53,9 @@ public class AccountController {
 
     public Account create(AccountRequest account) throws InvalidOperationException {
         try {
-            fromMailAddress(account.getMailAddress());
+            if (getFromId(account.getId()) == null) {
+                fromMailAddress(account.getMailAddress());
+            }
             throw new InvalidOperationException();
         } catch (NotFoundException e) {
             //ignore
@@ -61,8 +63,7 @@ public class AccountController {
         try {
             account.setPassword(new BCrypt().hash(account.getPassword()));
 
-            String generatedKey = null;
-            generatedKey = dao.create(account);
+            String generatedKey = dao.create(account);
 
             Account generatedAccount;
             if (generatedKey != null) {

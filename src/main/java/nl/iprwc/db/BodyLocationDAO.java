@@ -33,7 +33,7 @@ public class BodyLocationDAO {
             else throw new NotFoundException();
     }
 
-    public long post(String name) throws SQLException, ClassNotFoundException {
+    public long create(String name) throws SQLException, ClassNotFoundException {
             ResultSet results = DatabaseService.getInstance()
                     .createNamedPreparedStatement("INSERT INTO body_location (name) VALUES (:name)")
                     .setParameter("name", name)
