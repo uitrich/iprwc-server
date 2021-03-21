@@ -28,45 +28,33 @@ public class SessionController {
         return instance;
     }
 
-    /**
-     * Get the session based on the id.
-     * @param id
-     * @return
-     * @throws NotFoundException
-     */
     public Session fromId(long id) throws NotFoundException, InvalidOperationException {
         try {
             Session output = dao.fromId(id);
-            output.setAccount(AccountController.getInstance().getFromId(output.getAccount().getId()));
+            output.setAccount(AccountController.getInstance().get(output.getAccount().getId()));
             return output;
         } catch (SQLException | ClassNotFoundException e) {
-            throw new InvalidOperationException();
+            throw new InvalidOperationException(e.getMessage());
         }
     }
 
-    /**
-     * Get the session based on the session-key
-     * @param key
-     * @return
-     * @throws NotFoundException
-     */
     public Session fromSessionKey(String key) throws NotFoundException, InvalidOperationException {
         try {
             Session output = dao.fromHashedSessionKey(new Sha512().hash(key), key);
-            output.setAccount(AccountController.getInstance().getFromId(output.getAccount().getId()));
+            output.setAccount(AccountController.getInstance().get(output.getAccount().getId()));
             return output;
         } catch (SQLException | ClassNotFoundException e) {
-            throw new InvalidOperationException();
+            throw new InvalidOperationException(e.getMessage());
         }
     }
 
     public Session fromHashedSessionKey(String hashedKey) throws NotFoundException, InvalidOperationException {
         try {
             Session output = dao.fromHashedSessionKey(hashedKey);
-            output.setAccount(AccountController.getInstance().getFromId(output.getAccount().getId()));
+            output.setAccount(AccountController.getInstance().get(output.getAccount().getId()));
             return output;
         } catch (SQLException | ClassNotFoundException e) {
-            throw new InvalidOperationException();
+            throw new InvalidOperationException(e.getMessage());
         }
     }
 

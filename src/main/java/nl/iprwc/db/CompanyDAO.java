@@ -1,16 +1,18 @@
 package nl.iprwc.db;
 
+import nl.iprwc.db.interfacing.DatabaseAccessObjectCRUD;
 import nl.iprwc.exception.NotFoundException;
 import nl.iprwc.model.Company;
 import nl.iprwc.sql.DatabaseService;
+import nl.iprwc.sql.NamedParameterStatement;
 
-import javax.ws.rs.NotAuthorizedException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CompanyDAO {
+public class CompanyDAO implements DatabaseAccessObjectCRUD<Company, Long, Company> {
+    @Override
     public List<Company> getAll() throws SQLException, ClassNotFoundException {
         List<Company> result = new ArrayList<>();
         ResultSet unmodeled = DatabaseService.getInstance()
@@ -21,42 +23,50 @@ public class CompanyDAO {
         }
         return result;
     }
+    @Override
+    public Company get(Long id) throws NotFoundException, SQLException, ClassNotFoundException {
+        return fromResultSet(DatabaseService.getInstance()
+                .createNamedPreparedStatement("SELECT * FROM company WHERE id = :id")
+                .setParameter("id", id)
+                .executeQuery());
+    }
 
-    public Company get(long id) throws NotFoundException, SQLException, ClassNotFoundException {
-            ResultSet resultSet =  DatabaseService.getInstance()
-                    .createNamedPreparedStatement("SELECT * FROM company WHERE id = :id")
-                    .setParameter("id", id)
-                    .executeQuery();
-            if (resultSet.next()) {
-                return new Company(resultSet.getLong("id"), resultSet.getString("name"));
-            }
-            else throw new NotFoundException();
+    @Override
+    public boolean delete(Long identifier) throws SQLException, ClassNotFoundException {
+        return DatabaseService.getInstance()
+                .createNamedPreparedStatement("DELETE FROM Company WHERE id = :id")
+                .setParameter("id", identifier)
+                .executeUpdate() > 0;
     }
 
 
-    public long create(String name) throws SQLException, ClassNotFoundException {
-            return DatabaseService.getInstance()
-                    .createNamedPreparedStatement("INSERT INTO company (name) VALUES (:name)")
-                    .setParameter("name", name)
-                    .executeUpdate();
+    @Override
+    public Long create(Company creation) throws SQLException, ClassNotFoundException {
+        NamedParameterStatement statement =  DatabaseService.getInstance()
+                .createNamedPreparedStatement("INSERT INTO company (name) VALUES (:name)")
+                .setParameter("name", creation.getName());
+        statement.executeUpdate();
+        ResultSet keys = statement.getGeneratedKeys();
+        if (keys.next()) return keys.getLong("id");
+        else throw new SQLException("No keys were generated in the creation of a category");
     }
 
-    public boolean update(long id, String name) throws SQLException, ClassNotFoundException {
+    @Override
+    public boolean update(Company updateValue) throws SQLException, ClassNotFoundException {
             return DatabaseService.getInstance()
                     .createNamedPreparedStatement("UPDATE company SET name = :name WHERE id = :id")
-                    .setParameter("name", name)
-                    .setParameter("id", id)
-                    .execute();
-
+                    .setParameter("name", updateValue.getName())
+                    .setParameter("id", updateValue.getId())
+                    .executeUpdate() > 0;
     }
 
-    public boolean delete(long id) throws SQLException, ClassNotFoundException {
-            return DatabaseService.getInstance()
-                    .createNamedPreparedStatement("DELETE FROM Company WHERE id = :id")
-                    .setParameter("id", id)
-                    .execute();
-
+    @Override
+    public Company fromResultSet(ResultSet input) throws SQLException {
+        if (input.next())
+            return new Company(input.getLong("id"), input.getString("name"));
+        return null;
     }
+
 
     public int exists(String name) throws SQLException, ClassNotFoundException {
             ResultSet res = DatabaseService.getInstance()

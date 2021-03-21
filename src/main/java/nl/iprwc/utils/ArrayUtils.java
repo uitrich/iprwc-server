@@ -5,6 +5,9 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
+/**
+ * From Project IPSEN3
+ */
 public class ArrayUtils {
     private ArrayUtils() { }
 

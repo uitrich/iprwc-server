@@ -1,5 +1,6 @@
 package nl.iprwc.controller;
 
+import nl.iprwc.controller.interfacing.SimpleCRUDController;
 import nl.iprwc.db.CompanyDAO;
 import nl.iprwc.exception.InvalidOperationException;
 import nl.iprwc.exception.NotFoundException;
@@ -8,7 +9,7 @@ import nl.iprwc.model.Company;
 import java.sql.SQLException;
 import java.util.List;
 
-public class CompanyController {
+public class CompanyController implements SimpleCRUDController<Company, Long, Company> {
     private CompanyDAO dao;
     private static CompanyController instance;
 
@@ -24,43 +25,46 @@ public class CompanyController {
         return instance;
     }
 
+    @Override
     public List<Company> getAll() throws InvalidOperationException {
         try {
             return dao.getAll();
         } catch (SQLException | ClassNotFoundException e) {
-            throw new InvalidOperationException();
+            throw new InvalidOperationException(e.getMessage());
         }
     }
 
-    public Company get(long id) throws NotFoundException, InvalidOperationException {
+    @Override
+    public Company get(Long id) throws NotFoundException, InvalidOperationException {
         try {
             return dao.get(id);
         } catch (SQLException | ClassNotFoundException e) {
-            throw new InvalidOperationException();
+            throw new InvalidOperationException(e.getMessage());
         }
     }
 
-    public boolean update(long id, String name) throws InvalidOperationException {
+    @Override
+    public boolean update(Company updateValue) throws InvalidOperationException {
         try {
-            return dao.update(id, name);
+            return dao.update(updateValue);
         } catch (SQLException | ClassNotFoundException e) {
-            throw new InvalidOperationException();
+            throw new InvalidOperationException(e.getMessage());
         }
     }
-
-    public long create(String name) throws InvalidOperationException {
+    @Override
+    public Long create(Company creation) throws InvalidOperationException {
         try {
-            return dao.create(name);
+            return dao.create(creation);
         } catch (SQLException | ClassNotFoundException e) {
-            throw new InvalidOperationException();
+            throw new InvalidOperationException(e.getMessage());
         }
     }
-
-    public boolean delete(long id) throws InvalidOperationException {
+    @Override
+    public boolean delete(Long id) throws InvalidOperationException {
         try {
             return dao.delete(id);
         } catch (SQLException | ClassNotFoundException e) {
-            throw new InvalidOperationException();
+            throw new InvalidOperationException(e.getMessage());
         }
     }
 
@@ -68,9 +72,9 @@ public class CompanyController {
         int id = exists(company.getName());
         if (id == 0) {
             try {
-                dao.create(company.getName());
+                dao.create(company);
             } catch (SQLException | ClassNotFoundException e) {
-                throw new InvalidOperationException();
+                throw new InvalidOperationException(e.getMessage());
             }
             id = exists(company.getName());
         }

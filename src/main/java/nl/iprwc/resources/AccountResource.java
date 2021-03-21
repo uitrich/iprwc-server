@@ -36,7 +36,7 @@ public class AccountResource {
     @GET
     @RolesAllowed({"Role_Customer", "Role_Admin"})
     public Response getAccount(@Auth User user) throws InvalidOperationException {
-        return Response.status(Response.Status.OK).entity(controller.getFromId(user.getAccount().getId())).build();
+        return Response.status(Response.Status.OK).entity(controller.get(user.getAccount().getId())).build();
     }
     @GET
     @Path("/admin")
@@ -49,7 +49,7 @@ public class AccountResource {
     @Path("/admin/{id}")
     @RolesAllowed("Role_Admin")
     public Response getAccount(@PathParam("id") String personId) throws InvalidOperationException {
-            return Response.status(Response.Status.OK).entity(controller.getFromId(personId)).build();
+            return Response.status(Response.Status.OK).entity(controller.get(personId)).build();
     }
 
     @POST
@@ -59,8 +59,8 @@ public class AccountResource {
     }
     @POST
     @Path("/makeAccount")
-    public Response createAccount(@NotNull @Valid AccountRequest account) throws InvalidOperationException {
-            Account newAccount = controller.create(account);
+    public Response createAccount(@NotNull @Valid AccountRequest account) throws InvalidOperationException, NotFoundException {
+            Account newAccount = controller.createAccount(account);
             return Response.status(Response.Status.OK)
                     .entity(newAccount)
                     .build();
@@ -70,19 +70,19 @@ public class AccountResource {
     @Path("/update")
     @Consumes(MediaType.APPLICATION_JSON)
     @RolesAllowed("Role_Customer")
-    public Response updateAccount( @Auth User user, AccountRequest account) throws InvalidOperationException {
+    public Response updateAccount( @Auth User user, AccountRequest account) throws InvalidOperationException, NotFoundException {
         if (user.getAccount().getId().equals(account.getId()))
             return Response.status(Response.Status.OK)
-                    .entity(controller.updateAccount(account)).build();
+                    .entity(controller.update(account)).build();
         return Response.status(Response.Status.FORBIDDEN).build();
     }
     @PUT
     @Path("admin/update")
     @Consumes(MediaType.APPLICATION_JSON)
     @RolesAllowed("Role_Admin")
-    public Response updateAccount(AccountRequest accountRequest) throws InvalidOperationException, IOException {
+    public Response updateAccount(AccountRequest accountRequest) throws InvalidOperationException, NotFoundException {
         return Response.status(Response.Status.OK)
-                .entity(controller.updateAccount(accountRequest)).build();
+                .entity(controller.update(accountRequest)).build();
     }
 
     @DELETE
@@ -92,7 +92,7 @@ public class AccountResource {
     @RolesAllowed("Role_Customer")
     public Response deleteAccount(@Auth User user) throws InvalidOperationException, NotFoundException {
         return Response.status(Response.Status.OK)
-                .entity(controller.deleteAccount(user.getAccount().getMailAddress())).build();
+                .entity(controller.delete(user.getAccount().getMailAddress())).build();
     }
 
     @DELETE
@@ -101,7 +101,7 @@ public class AccountResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @RolesAllowed("Role_Admin")
     public Response deleteAccount(@PathParam("email") String accountEmail) throws InvalidOperationException, NotFoundException {
-        return Response.status(Response.Status.OK).entity(controller.deleteAccount(accountEmail)).build();
+        return Response.status(Response.Status.OK).entity(controller.delete(accountEmail)).build();
     }
 
 }

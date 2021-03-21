@@ -16,7 +16,6 @@ public class AddHeaderFilter implements ContainerResponseFilter {
     public void filter(ContainerRequestContext requestContext, ContainerResponseContext responseContext)
             throws IOException {
 
-       // responseContext.getHeaders().add("Access-Control-Allow-Origin", SoftiServerApplication.getServerConfiguration().getWebUrl());
         responseContext.getHeaders().add("Access-Control-Allow-Origin", SoftiServerApplication.getServerConfiguration().getWebUrl());
         responseContext.getHeaders().add("Access-Control-Allow-Credentials", "true");
         responseContext.getHeaders().add("Access-Control-Allow-Headers", "Content-Type");

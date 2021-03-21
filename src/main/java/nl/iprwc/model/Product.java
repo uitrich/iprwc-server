@@ -4,12 +4,11 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class Product {
-    //name,price,body_location,category,company,id,image
     private String name;
     private double price;
-    private int bodyLocation;
-    private int category;
-    private int company;
+    private long bodyLocation;
+    private long category;
+    private long company;
     private long id;
     private String image;
 
@@ -47,27 +46,27 @@ public class Product {
         this.id = id;
     }
     @JsonProperty
-    public int getCompany() {
+    public long getCompany() {
         return company;
     }
 
-    public void setCompany(int company) {
+    public void setCompany(long company) {
         this.company = company;
     }
     @JsonProperty
-    public int getCategory() {
+    public long getCategory() {
         return category;
     }
 
-    public void setCategory(int category) {
+    public void setCategory(long category) {
         this.category = category;
     }
     @JsonProperty
-    public int getBodyLocation() {
+    public long getBodyLocation() {
         return bodyLocation;
     }
 
-    public void setBodyLocation(int bodyLocation) {
+    public void setBodyLocation(long bodyLocation) {
         this.bodyLocation = bodyLocation;
     }
     @JsonProperty

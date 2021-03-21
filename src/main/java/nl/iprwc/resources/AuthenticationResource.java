@@ -34,8 +34,11 @@ public class AuthenticationResource
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response logIn(@NotNull @Valid CredentialsRequest auth) throws InvalidOperationException {
-        Session session = controller.logIn(auth);
-        if (session == null) {
+        Session session = null;
+        try {
+            session = controller.logIn(auth);
+            if (session == null) throw new NotFoundException();
+        } catch (NotFoundException e) {
             throw new WebApplicationException(org.eclipse.jetty.server.Response.SC_UNAUTHORIZED);
         }
 

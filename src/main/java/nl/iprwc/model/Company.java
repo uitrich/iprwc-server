@@ -11,6 +11,10 @@ public class Company {
         this.id = id;
         this.name = name;
     }
+    public Company(String name) {
+        this.id = 0;
+        this.name = name;
+    }
     public Company() {
         this.id = 0;
         this.name = "";

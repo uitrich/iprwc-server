@@ -4,6 +4,7 @@ package nl.iprwc.resources;
 import nl.iprwc.controller.BodyLocationController;
 import nl.iprwc.exception.InvalidOperationException;
 import nl.iprwc.exception.NotFoundException;
+import nl.iprwc.model.BodyLocation;
 
 import javax.annotation.security.RolesAllowed;
 import javax.ws.rs.*;
@@ -39,7 +40,7 @@ public class BodyLocationResource {
     @Produces(MediaType.APPLICATION_JSON)
     @RolesAllowed("Role_Admin")
     public Response create(String name) throws InvalidOperationException {
-        return Response.status(Response.Status.OK).entity(controller.create(name)).build();
+        return Response.status(Response.Status.OK).entity(controller.create(new BodyLocation(name))).build();
     }
 
     @PUT
@@ -48,6 +49,6 @@ public class BodyLocationResource {
     @Produces(MediaType.APPLICATION_JSON)
     @RolesAllowed("Role_Admin")
     public Response update(@PathParam("id") long id, String name) throws InvalidOperationException {
-        return Response.status(Response.Status.OK).entity(controller.update(id, name)).build();
+        return Response.status(Response.Status.OK).entity(controller.update(new BodyLocation(id, name))).build();
     }
 }

@@ -13,7 +13,6 @@ import java.text.SimpleDateFormat;
 import java.util.TimeZone;
 
 public class SoftiServerConfiguration extends Configuration {
-    // TODO: probeer een manier te vinden om custom instellingen in config.yml te zetten
     @NotEmpty
     private String sessionDurationRaw = "PT7200S"; // Java seems a bit stupid here, why doesn't PT2H work?
     private Duration sessionDuration;

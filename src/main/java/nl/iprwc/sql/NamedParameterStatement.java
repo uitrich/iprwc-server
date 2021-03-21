@@ -39,7 +39,6 @@ public class NamedParameterStatement {
      * @return the parsed query
      */
     static final String parse(String query, Map paramMap) {
-        // I was originally using regular expressions, but they didn't work well
 
         // parameter-like strings inside quotes.
         int length=query.length();

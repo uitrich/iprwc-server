@@ -1,5 +1,6 @@
 package nl.iprwc.controller;
 
+import nl.iprwc.controller.interfacing.SimpleCRUDController;
 import nl.iprwc.db.BodyLocationDAO;
 import nl.iprwc.exception.InvalidOperationException;
 import nl.iprwc.exception.NotFoundException;
@@ -8,7 +9,7 @@ import nl.iprwc.model.BodyLocation;
 import java.sql.SQLException;
 import java.util.List;
 
-public class BodyLocationController {
+public class BodyLocationController implements SimpleCRUDController<BodyLocation, Long, BodyLocation> {
     private static BodyLocationController instance;
     private BodyLocationDAO dao;
 
@@ -20,51 +21,51 @@ public class BodyLocationController {
         dao = new BodyLocationDAO();
     }
 
-    /**
-     * Create a singleton from supercontroller, this controller has access to all other controller and can be called from anywhere.
-     * @return
-     */
     public static BodyLocationController getInstance() {
         return instance;
     }
 
+    @Override
     public List<BodyLocation> getAll() throws InvalidOperationException {
         try {
             return dao.getAll();
         } catch (SQLException | ClassNotFoundException e) {
-            throw new InvalidOperationException();
+            throw new InvalidOperationException(e.getMessage());
         }
     }
 
-    public BodyLocation get(long id) throws NotFoundException, InvalidOperationException {
+    @Override
+    public BodyLocation get(Long id) throws InvalidOperationException {
         try {
             return dao.get(id);
         } catch (SQLException | ClassNotFoundException e) {
-            throw new InvalidOperationException();
+            throw new InvalidOperationException(e.getMessage());
         }
     }
-
-    public boolean update(long id, String name) throws InvalidOperationException {
+    @Override
+    public boolean update(BodyLocation bodyLocation) throws InvalidOperationException {
         try {
-            return dao.update(id, name);
+            return dao.update(bodyLocation);
         } catch (SQLException | ClassNotFoundException e) {
-            throw new InvalidOperationException();
+            throw new InvalidOperationException(e.getMessage());
         }
     }
 
-    public long create(String name) throws InvalidOperationException {
+    @Override
+    public Long create(BodyLocation creationValue) throws InvalidOperationException {
         try {
-            return dao.create(name);
+            return dao.create(creationValue);
         }  catch (SQLException | ClassNotFoundException e) {
-            throw new InvalidOperationException();
+            throw new InvalidOperationException(e.getMessage());
         }
     }
 
-    public boolean delete(long id) throws InvalidOperationException {
+    @Override
+    public boolean delete(Long id) throws InvalidOperationException {
         try {
             return dao.delete(id);
         }  catch (SQLException | ClassNotFoundException e) {
-            throw new InvalidOperationException();
+            throw new InvalidOperationException(e.getMessage());
         }
     }
 
@@ -72,9 +73,9 @@ public class BodyLocationController {
         int id = exists(body_location.getName());
         if (id == 0) {
             try {
-                dao.create(body_location.getName());
+                dao.create(body_location);
             } catch (SQLException | ClassNotFoundException e) {
-                throw new InvalidOperationException();
+                throw new InvalidOperationException(e.getMessage());
             }
             id = exists(body_location.getName());
         }
@@ -85,7 +86,7 @@ public class BodyLocationController {
         try {
             return dao.exists(name);
         }  catch (SQLException | ClassNotFoundException e) {
-            throw new InvalidOperationException();
+            throw new InvalidOperationException(e.getMessage());
         }
     }
 }

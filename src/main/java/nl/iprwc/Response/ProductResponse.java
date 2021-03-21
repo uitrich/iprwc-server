@@ -17,7 +17,6 @@ import nl.iprwc.exception.NotFoundException;
 import java.net.URL;
 
 public class ProductResponse {
-    //name,price,body_location,category,company,id,image
     private String name;
     private double price;
     private BodyLocation bodyLocation;

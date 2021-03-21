@@ -84,10 +84,6 @@ public class ProductController {
         }
     }
 
-    public List<ProductResponse> populateList(List<Product> input) throws nl.iprwc.exception.NotFoundException, InvalidOperationException {
-        return populateProductList(input);
-    }
-
     public ProductResponse insertAdd(ProductResponse input) throws InvalidOperationException, nl.iprwc.exception.NotFoundException {
         Product product = splitResponse(input);
         String image = product.getImage();
@@ -135,7 +131,7 @@ public class ProductController {
         return new Product(product.getName(), product.getPrice(), bodId, catId, comId, product.getId(), product.getImage());
     }
 
-    public List<ProductResponse> getAllIndestinctive() throws NotFoundException, InvalidOperationException {
+    public List<ProductResponse> getAllIndistinctly() throws NotFoundException, InvalidOperationException {
         try {
             return makeResponseList(dao.getAll());
         } catch (SQLException | ClassNotFoundException e) {

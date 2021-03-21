@@ -32,11 +32,6 @@ public class BaseImageTranslator {
         }
     }
 
-    public void addFile(String baseImage) {
-        //System.out.println("Attempting to convert files to Images");
-        queue.add(baseImage);
-    }
-
     @Override
     protected void finalize() throws Throwable {
         try {

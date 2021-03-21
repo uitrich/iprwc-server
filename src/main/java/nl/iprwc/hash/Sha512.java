@@ -41,7 +41,7 @@ public class Sha512 {
         }
         catch (NoSuchAlgorithmException e) {
             return new byte[] { };
-            // never thrown
+            // should never be thrown
         }
 
         byte[][] chunks = ArrayUtils.chunk(bytes, chunkSize);

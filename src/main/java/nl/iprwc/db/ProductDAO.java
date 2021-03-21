@@ -58,7 +58,7 @@ public class ProductDAO {
             return fromResultSet(result);
     }
 
-    public Paginated<List<ProductResponse>>     getMultiple(long maxPrice, long minPrice, List<Integer> company, List<Integer> categories, List<Integer> bodyLocation, String search, LongParam page, LongParam pageSize) throws SQLException, ClassNotFoundException, nl.iprwc.exception.NotFoundException, InvalidOperationException {
+    public Paginated<List<ProductResponse>> getMultiple(long maxPrice, long minPrice, List<Integer> company, List<Integer> categories, List<Integer> bodyLocation, String search, LongParam page, LongParam pageSize) throws SQLException, ClassNotFoundException, nl.iprwc.exception.NotFoundException, InvalidOperationException {
         String initialString = "SELECT * FROM Product ";
         String queryContents = "";
         boolean categoricalSearch = categories.size() > 0 || company.size() > 0 || bodyLocation.size() > 0;
@@ -138,7 +138,6 @@ public class ProductDAO {
             String image = product.getImage();
             String id = String.valueOf(product.getId());
             id = id.replace("\nRETURNING", "");
-            //name,price,body_location,category,company,id,image
             NamedParameterStatement resultkey = DatabaseService.getInstance().createNamedPreparedStatement(
                     "UPDATE product " +
                             "SET name = :name, " +

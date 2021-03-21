@@ -1,18 +1,19 @@
 package nl.iprwc.db;
 
-import nl.iprwc.exception.InvalidOperationException;
+import nl.iprwc.db.interfacing.DatabaseAccessObjectCRUD;
 import nl.iprwc.exception.NotFoundException;
 import nl.iprwc.model.Category;
 import nl.iprwc.sql.DatabaseService;
+import nl.iprwc.sql.NamedParameterStatement;
 
-import javax.xml.crypto.Data;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CategoryDAO {
+public class CategoryDAO implements DatabaseAccessObjectCRUD<Category, Long, Category> {
 
+    @Override
     public List<Category> getAll() throws SQLException, ClassNotFoundException {
             List<Category> result = new ArrayList<>();
             ResultSet unmodeled = DatabaseService.getInstance()
@@ -23,24 +24,47 @@ public class CategoryDAO {
             }
             return result;
     }
-
-    public Category get(long id) throws NotFoundException, SQLException, ClassNotFoundException {
-        ResultSet resultSet =  DatabaseService.getInstance()
+    @Override
+    public Category get(Long id) throws NotFoundException, SQLException, ClassNotFoundException {
+        return fromResultSet(DatabaseService.getInstance()
                 .createNamedPreparedStatement("SELECT * FROM category WHERE id = :id")
                 .setParameter("id", id)
-                .executeQuery();
-        if (resultSet.next()) {
-            return new Category(resultSet.getLong("id"), resultSet.getString("name"));
-        }
-        else throw new NotFoundException();
+                .executeQuery());
     }
 
-    public void create(String name) throws SQLException, ClassNotFoundException {
-        boolean result = !DatabaseService.getInstance()
+    @Override
+    public Long create(Category creation) throws SQLException, ClassNotFoundException {
+        NamedParameterStatement statement =  DatabaseService.getInstance()
                 .createNamedPreparedStatement("INSERT INTO category (name) VALUES (:name)")
-                .setParameter("name", name)
+                .setParameter("name", creation.getName());
+        statement.executeUpdate();
+        ResultSet keys = statement.getGeneratedKeys();
+        if (keys.next()) return keys.getLong("id");
+        else throw new SQLException("No keys were generated in the creation of a category");
+    }
+
+    @Override
+    public boolean delete(Long identifier) throws SQLException, ClassNotFoundException {
+        return DatabaseService.getInstance()
+                .createNamedPreparedStatement("DELETE FROM category WHERE id = :id")
+                .setParameter("id", identifier)
                 .execute();
-        if (!result) throw new SQLException();
+    }
+
+    @Override
+    public boolean update(Category updateValue) throws SQLException, ClassNotFoundException {
+        return DatabaseService.getInstance()
+                .createNamedPreparedStatement("UPDATE category SET name = :name WHERE id = :id")
+                .setParameter("name", updateValue.getName())
+                .setParameter("id", updateValue.getId())
+                .executeUpdate() > 0;
+    }
+
+    @Override
+    public Category fromResultSet(ResultSet input) throws SQLException {
+        if (input.next())
+            return new Category(input.getLong("id"), input.getString("name"));
+        return null;
     }
 
     public long getByName(String name) throws SQLException, ClassNotFoundException, NotFoundException {
@@ -49,21 +73,6 @@ public class CategoryDAO {
             return result.getLong("id");
         }
         throw new NotFoundException();
-    }
-
-    public boolean update(long id, String name) throws SQLException, ClassNotFoundException {
-        return DatabaseService.getInstance()
-                .createNamedPreparedStatement("UPDATE category SET name = :name WHERE id = :id")
-                .setParameter("name", name)
-                .setParameter("id", id)
-                .execute();
-    }
-
-    public boolean delete(long id) throws SQLException, ClassNotFoundException {
-        return DatabaseService.getInstance()
-                .createNamedPreparedStatement("DELETE FROM category WHERE id = :id")
-                .setParameter("id", id)
-                .execute();
     }
 
     public boolean exists(String name) throws SQLException, ClassNotFoundException {

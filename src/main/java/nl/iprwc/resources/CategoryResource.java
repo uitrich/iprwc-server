@@ -4,6 +4,7 @@ package nl.iprwc.resources;
 import nl.iprwc.controller.*;
 import nl.iprwc.exception.InvalidOperationException;
 import nl.iprwc.exception.NotFoundException;
+import nl.iprwc.model.Category;
 
 import javax.annotation.security.RolesAllowed;
 import javax.ws.rs.*;
@@ -38,7 +39,7 @@ public class CategoryResource {
     @Produces(MediaType.APPLICATION_JSON)
     @RolesAllowed("Role_Admin")
     public Response create(String name) throws InvalidOperationException {
-        controller.create(name);
+        controller.create(new Category(name));
         return Response.status(Response.Status.OK).build();
     }
 
@@ -47,7 +48,7 @@ public class CategoryResource {
     @Path("/{id}")
     @RolesAllowed("Role_Admin")
     public Response update(@PathParam("id") long id, String name) throws InvalidOperationException {
-        controller.update(id, name);
+        controller.update(new Category(id, name));
         return Response.status(Response.Status.OK).build();
     }
 }

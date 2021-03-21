@@ -4,11 +4,9 @@ package nl.iprwc.resources;
 import io.dropwizard.auth.Auth;
 import io.dropwizard.jersey.params.LongParam;
 import nl.iprwc.Response.ProductResponse;
-import nl.iprwc.controller.GroupController;
 import nl.iprwc.controller.ProductController;
 import nl.iprwc.exception.InvalidOperationException;
 import nl.iprwc.exception.NotFoundException;
-import nl.iprwc.model.Product;
 import nl.iprwc.model.User;
 
 import javax.annotation.security.RolesAllowed;
@@ -16,8 +14,6 @@ import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.ws.rs.*;
 import javax.ws.rs.core.*;
-import java.io.IOException;
-import java.sql.SQLException;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -53,7 +49,7 @@ public class ProductResource {
     @RolesAllowed("Role_Admin")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getAllProducts() throws NotFoundException, InvalidOperationException {
-        return Response.status(Response.Status.OK).entity(controller.getAllIndestinctive()).build();
+        return Response.status(Response.Status.OK).entity(controller.getAllIndistinctly()).build();
     }
 
     @GET

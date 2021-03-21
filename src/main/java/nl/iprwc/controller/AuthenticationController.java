@@ -32,7 +32,7 @@ public class AuthenticationController {
     }
 
 
-    public Session logIn(CredentialsRequest authentication) throws InvalidOperationException {
+    public Session logIn(CredentialsRequest authentication) throws InvalidOperationException, NotFoundException {
         Account account = accountController.fromMailAddress(authentication.getMailAddress());
         if (!new BCrypt().verifyHash(authentication.getPassword(), account.getPasswordHash())) {
             return null;
@@ -46,11 +46,6 @@ public class AuthenticationController {
         sessionController.delete(session);
     }
 
-    /**
-     * Returns a sesion state, it can be used to see if a user is still logged on.
-     * @param sessionKey
-     * @return
-     */
     public SessionStateResponse getSessionState(String sessionKey) throws NotFoundException, InvalidOperationException {
         Session session = sessionController.fromSessionKey(sessionKey);
         return new SessionStateResponse(session);

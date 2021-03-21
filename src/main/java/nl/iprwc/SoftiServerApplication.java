@@ -7,10 +7,6 @@ import io.dropwizard.configuration.EnvironmentVariableSubstitutor;
 import io.dropwizard.configuration.SubstitutingSourceProvider;
 import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
-import nl.iprwc.controller.AccountController;
-import nl.iprwc.controller.AuthenticationController;
-import nl.iprwc.controller.BodyLocationController;
-import nl.iprwc.controller.CategoryController;
 import nl.iprwc.core.AccountAuthorizationFilter;
 import nl.iprwc.core.AddHeaderFilter;
 import nl.iprwc.healtcheck.DatabaseHealthCheck;
@@ -30,16 +26,16 @@ public class SoftiServerApplication extends Application<SoftiServerConfiguration
         new SoftiServerApplication().run(args);
     }
 
-    private static SoftiServerConfiguration docciServerConfiguration;
+    private static SoftiServerConfiguration softiServerConfiguration;
 
     public static SoftiServerConfiguration getServerConfiguration()
     {
-        return docciServerConfiguration;
+        return softiServerConfiguration;
     }
 
     @Override
     public String getName() {
-        return "docci";
+        return "softi";
     }
 
     @Override
@@ -57,7 +53,7 @@ public class SoftiServerApplication extends Application<SoftiServerConfiguration
     @Override
     public void run(final SoftiServerConfiguration configuration,
                     final Environment environment) {
-        docciServerConfiguration = configuration;
+        softiServerConfiguration = configuration;
         final FilterRegistration.Dynamic cors =
                 environment.servlets().addFilter("CORS", CrossOriginFilter.class);
 
