@@ -16,15 +16,16 @@ public class SessionController {
     private SessionDAO dao;
     private static SessionController instance;
 
-    public static synchronized SessionController getInstance() {
-        if (instance == null) {
-            instance = new SessionController();
-        }
-
-        return instance;
+    static {
+        instance = new SessionController();
     }
+
     private SessionController() {
         dao = new SessionDAO();
+    }
+
+    public static SessionController getInstance() {
+        return instance;
     }
 
     /**

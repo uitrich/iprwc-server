@@ -25,6 +25,19 @@ public class SoftiServerConfiguration extends Configuration {
     private String defaultTimeZone = "UTC";
     private String filePath;
 
+    private String webUrl;
+
+    @NotNull
+    @JsonProperty("webUrl")
+    public String getWebUrl() {
+        return webUrl;
+    }
+
+    @JsonProperty("webUrl")
+    public void setWebUrl(String webUrl) {
+        this.webUrl = webUrl;
+    }
+
     @Valid
     @NotNull
     private DataSourceFactory database = new DataSourceFactory();

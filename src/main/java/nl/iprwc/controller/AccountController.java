@@ -17,15 +17,17 @@ import java.util.UUID;
 public class AccountController {
     private final AccountDAO dao;
     private static AccountController instance;
-    public static synchronized AccountController getInstance() {
-        if (instance == null) {
-            instance = new AccountController();
-        }
 
-        return instance;
+    static {
+        instance = new AccountController();
     }
+
     public AccountController() {
         dao = new AccountDAO();
+    }
+
+    public static AccountController getInstance() {
+        return instance;
     }
 
     public Account getFromId(String id) throws InvalidOperationException {
@@ -83,7 +85,7 @@ public class AccountController {
         }
     }
 
-    public Account updateAccount(Account account) throws InvalidOperationException {
+    public Account updateAccount(AccountRequest account) throws InvalidOperationException {
         try {
             return dao.updateAccount(account);
         } catch (SQLException | ClassNotFoundException e) {
@@ -91,11 +93,12 @@ public class AccountController {
         }
     }
 
-    public boolean deleteAccount(String account) throws InvalidOperationException {
+    public boolean deleteAccount(String email) throws InvalidOperationException, nl.iprwc.exception.NotFoundException {
         try {
-            ShoppingCartController.getInstance().delete(account);
-            GroupController.getInstance().deleteAccountGroup(account);
-            return dao.delete(account);
+            Account account = fromMailAddress(email);
+            ShoppingCartController.getInstance().delete(account.getId());
+            GroupController.getInstance().deleteAccountGroup(account.getId());
+            return dao.delete(account.getId());
         } catch (SQLException | ClassNotFoundException e) {
             throw new InvalidOperationException();
         }

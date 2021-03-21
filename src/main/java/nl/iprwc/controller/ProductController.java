@@ -17,19 +17,19 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ProductController {
-    private final ProductDAO dao;
-
+    private ProductDAO dao;
     private static ProductController instance;
 
-    public static synchronized ProductController getInstance() {
-        if (instance == null) {
-            instance = new ProductController();
-        }
-
-        return instance;
+    static {
+        instance = new ProductController();
     }
+
     private ProductController() {
         dao = new ProductDAO();
+    }
+
+    public static ProductController getInstance() {
+        return instance;
     }
 
     public ProductResponse getFromId(long id) throws InvalidOperationException, NotFoundException {

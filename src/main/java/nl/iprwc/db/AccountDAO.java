@@ -7,6 +7,7 @@ import nl.iprwc.model.Group;
 import nl.iprwc.sql.DatabaseService;
 import nl.iprwc.sql.NamedParameterStatement;
 
+import javax.naming.Name;
 import javax.ws.rs.NotFoundException;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -165,25 +166,20 @@ public class AccountDAO {
         throw new NotFoundException();
     }
 
-    public Account updateAccount(Account account) throws SQLException, ClassNotFoundException {
-        account = replaceNull(account);
+    public Account updateAccount(AccountRequest account) throws SQLException, ClassNotFoundException {
             NamedParameterStatement statement = DatabaseService.getInstance()
                     .createNamedPreparedStatement(
                             "UPDATE account SET" +
-                                    " mailaddress = :mailaddress," +
-                                    " password = :password," +
                                     " firstname = :firstname," +
                                     " lastname = :lastname," +
                                     " postal_code = :postalCode," +
                                     " house_number = :house_number " +
-                                    "WHERE id = :id")
+                                    "WHERE mailaddress = :mailaddress")
                     .setParameter("mailaddress", account.getMailAddress())
-                    .setParameter("password", account.getPasswordHash())
                     .setParameter("firstname", account.getFirstName())
                     .setParameter("lastname", account.getLastName())
                     .setParameter("postalCode", account.getPostalCode())
-                    .setParameter("house_number", account.getHouseNumber())
-                    .setParameter("id", account.getId());
+                    .setParameter("house_number", account.getHouseNumber());
             if(statement.executeUpdate() == 0){
                 throw new NotFoundException();
             }
@@ -200,7 +196,7 @@ public class AccountDAO {
             return DatabaseService.getInstance()
                     .createNamedPreparedStatement("DELETE FROM account WHERE id = :id")
                     .setParameter("id", account)
-            .execute();
+                    .executeUpdate() > 0;
     }
 
     public List<Account> getAll() throws SQLException, ClassNotFoundException {

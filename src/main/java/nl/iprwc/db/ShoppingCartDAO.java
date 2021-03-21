@@ -84,17 +84,6 @@ public class ShoppingCartDAO {
             .executeQuery();
         return results.next();
     }
-    private long getItemQuantity(String accountId, long productId) throws SQLException, ClassNotFoundException, NotFoundException {
-        ResultSet resultSet = DatabaseService.getInstance()
-                .createNamedPreparedStatement("SELECT quantity FROM shopping_cart " +
-                        "WHERE account_id = :accountId AND product_id = :productId")
-                .setParameter("accountId", accountId)
-                .setParameter("productId", productId)
-        .executeQuery();
-        if (resultSet.next())
-            return resultSet.getLong("quantity");
-        throw new NotFoundException();
-    }
 
     public boolean deleteAccount(String id) throws SQLException, ClassNotFoundException {
         return DatabaseService.getInstance()
@@ -102,4 +91,13 @@ public class ShoppingCartDAO {
                 .setParameter("id", id)
                 .execute();
     }
+
+    public boolean updateSales(long id, long quantity) throws SQLException, ClassNotFoundException {
+        return DatabaseService.getInstance()
+                .createNamedPreparedStatement("update product_stats set sales = sales + :qty where product_id = :id")
+                .setParameter("qty", quantity)
+                .setParameter("id", id)
+                .executeUpdate() > 0;
+    }
+
 }

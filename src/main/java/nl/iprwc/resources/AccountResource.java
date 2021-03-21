@@ -2,11 +2,13 @@ package nl.iprwc.resources;
 
 
 import com.fasterxml.jackson.annotation.JsonView;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sun.media.sound.InvalidDataException;
 import io.dropwizard.auth.Auth;
 import nl.iprwc.Request.AccountRequest;
 import nl.iprwc.controller.AccountController;
 import nl.iprwc.exception.InvalidOperationException;
+import nl.iprwc.exception.NotFoundException;
 import nl.iprwc.model.Account;
 import nl.iprwc.model.Authentication;
 import nl.iprwc.model.User;
@@ -18,6 +20,7 @@ import javax.validation.constraints.NotNull;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.io.IOException;
 import java.sql.SQLException;
 import java.util.UUID;
 
@@ -67,19 +70,19 @@ public class AccountResource {
     @Path("/update")
     @Consumes(MediaType.APPLICATION_JSON)
     @RolesAllowed("Role_Customer")
-    public Response updateAccount( @Auth User user, Account account) throws InvalidOperationException {
+    public Response updateAccount( @Auth User user, AccountRequest account) throws InvalidOperationException {
         if (user.getAccount().getId().equals(account.getId()))
             return Response.status(Response.Status.OK)
-                    .entity(controller.updateAccount(user.getAccount())).build();
+                    .entity(controller.updateAccount(account)).build();
         return Response.status(Response.Status.FORBIDDEN).build();
     }
     @PUT
     @Path("admin/update")
     @Consumes(MediaType.APPLICATION_JSON)
     @RolesAllowed("Role_Admin")
-    public Response updateAccount(Account account) throws InvalidOperationException {
+    public Response updateAccount(AccountRequest accountRequest) throws InvalidOperationException, IOException {
         return Response.status(Response.Status.OK)
-                .entity(controller.updateAccount(account)).build();
+                .entity(controller.updateAccount(accountRequest)).build();
     }
 
     @DELETE
@@ -87,18 +90,18 @@ public class AccountResource {
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     @RolesAllowed("Role_Customer")
-    public Response deleteAccount(@Auth User user) throws InvalidOperationException {
+    public Response deleteAccount(@Auth User user) throws InvalidOperationException, NotFoundException {
         return Response.status(Response.Status.OK)
-                .entity(controller.deleteAccount(user.getAccount().getId())).build();
+                .entity(controller.deleteAccount(user.getAccount().getMailAddress())).build();
     }
 
     @DELETE
-    @Path("/admin/delete/{id}")
+    @Path("/admin/delete/{email}")
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     @RolesAllowed("Role_Admin")
-    public Response deleteAccount(@PathParam("id") String account) throws InvalidOperationException {
-        return Response.status(Response.Status.OK).entity(controller.deleteAccount(account)).build();
+    public Response deleteAccount(@PathParam("email") String accountEmail) throws InvalidOperationException, NotFoundException {
+        return Response.status(Response.Status.OK).entity(controller.deleteAccount(accountEmail)).build();
     }
 
 }

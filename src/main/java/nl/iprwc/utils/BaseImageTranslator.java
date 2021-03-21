@@ -89,9 +89,6 @@ public class BaseImageTranslator {
             // create a buffered image
             BufferedImage image = null;
 
-//            DEPRICATED
-//            BASE64Decoder decoder = new BASE64Decoder();
-//            imageByte = decoder.decodeBuffer(base64Image);
             imageByte = Base64.getDecoder().decode(base64Image);
             ByteArrayInputStream bis = new ByteArrayInputStream(imageByte);
             image = ImageIO.read(bis);

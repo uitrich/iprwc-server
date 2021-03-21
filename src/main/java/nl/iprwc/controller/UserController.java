@@ -5,14 +5,15 @@ import nl.iprwc.model.User;
 
 public class UserController {
  private static UserController instance;
-    public static synchronized UserController getInstance() {
-        if (instance == null) {
-            instance = new UserController();
-        }
+    static {
+        instance = new UserController();
+    }
 
+    private UserController() {}
+
+    public static UserController getInstance() {
         return instance;
     }
-    private UserController() {}
 
     public User fromAccount(Account account)
     {

@@ -12,15 +12,16 @@ public class CategoryController {
     private CategoryDAO dao;
     private static CategoryController instance;
 
-    public static synchronized CategoryController getInstance() {
-        if (instance == null) {
-            instance = new CategoryController();
-        }
-
-        return instance;
+    static {
+        instance = new CategoryController();
     }
+
     private CategoryController() {
         dao = new CategoryDAO();
+    }
+
+    public static CategoryController getInstance() {
+        return instance;
     }
 
     public boolean exists(String name) throws InvalidOperationException {

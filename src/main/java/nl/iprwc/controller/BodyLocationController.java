@@ -10,23 +10,24 @@ import java.util.List;
 
 public class BodyLocationController {
     private static BodyLocationController instance;
+    private BodyLocationDAO dao;
+
+    static {
+        instance = new BodyLocationController();
+    }
+
+    private BodyLocationController() {
+        dao = new BodyLocationDAO();
+    }
 
     /**
      * Create a singleton from supercontroller, this controller has access to all other controller and can be called from anywhere.
      * @return
      */
-    public static synchronized BodyLocationController getInstance() {
-        if (instance == null) {
-            instance = new BodyLocationController();
-        }
-
+    public static BodyLocationController getInstance() {
         return instance;
     }
-    private BodyLocationController() {
-        dao = new BodyLocationDAO();
-    }
 
-    BodyLocationDAO dao = new BodyLocationDAO();
     public List<BodyLocation> getAll() throws InvalidOperationException {
         try {
             return dao.getAll();

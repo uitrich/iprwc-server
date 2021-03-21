@@ -14,16 +14,19 @@ import java.util.List;
 public class ShoppingCartController {
     private ShoppingCartDAO dao;
     private static ShoppingCartController instance;
-    public static synchronized ShoppingCartController getInstance() {
-        if (instance == null) {
-            instance = new ShoppingCartController();
-        }
 
-        return instance;
+    static {
+        instance = new ShoppingCartController();
     }
+
     private ShoppingCartController() {
         dao = new ShoppingCartDAO();
     }
+
+    public static ShoppingCartController getInstance() {
+        return instance;
+    }
+
     public void addItem(long id, String user) throws NotFoundException, InvalidOperationException {
         try {
             if (!dao.isItemAlreadyIn(id, user)) {
@@ -64,6 +67,19 @@ public class ShoppingCartController {
         } catch (SQLException | ClassNotFoundException e) {
             throw new InvalidOperationException();
         }
+    }
+
+    public boolean updateSales(List<List<Long>> quantities, String userId) throws InvalidOperationException {
+        boolean success = true;
+        try {
+            for (List<Long> qtyPair : quantities) {
+                success = success && dao.updateSales(qtyPair.get(1), qtyPair.get(0));
+            }
+        } catch (SQLException | ClassNotFoundException e) {
+            throw new InvalidOperationException();
+        }
+        if (success) delete(userId);
+        return success;
     }
 
     public boolean delete(String id) throws InvalidOperationException {

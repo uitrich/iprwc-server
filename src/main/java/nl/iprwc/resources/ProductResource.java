@@ -38,12 +38,12 @@ public class ProductResource {
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getAllProducts(@QueryParam("page")            @DefaultValue("1")  @Min(1) LongParam page,
-                                   @QueryParam("page-size")       @DefaultValue("12") @Min(1) @Max(100) LongParam       pageSize,
-                                   @QueryParam("category")                                              List<Integer> category,
-                                   @QueryParam("company")                                               List<Integer> company,
-                                   @QueryParam("bodyLocation")                                          List<Integer> bodyLocation,
-                                   @QueryParam("search")                                                String search
+    public Response getAllProductsFiltered(@QueryParam("page")            @DefaultValue("1")  @Min(1) LongParam page,
+                                           @QueryParam("page-size")       @DefaultValue("12") @Min(1) @Max(100) LongParam       pageSize,
+                                           @QueryParam("category")                                              List<Integer> category,
+                                           @QueryParam("company")                                               List<Integer> company,
+                                           @QueryParam("bodyLocation")                                          List<Integer> bodyLocation,
+                                           @QueryParam("search")                                                String search
     ) throws NotFoundException, InvalidOperationException {
         return Response.status(Response.Status.OK).entity(controller.getAll(page, pageSize, search, category, company, bodyLocation)).build();
 
@@ -59,7 +59,6 @@ public class ProductResource {
     @GET
     @Path("/{id}")
     @Produces(MediaType.APPLICATION_JSON)
-    @RolesAllowed("Role_Admin")
     public Response getFromId(@PathParam("id") long id, @Auth User user) throws InvalidOperationException, NotFoundException {
         return Response.status(Response.Status.OK).entity(controller.getFromId(id)).build();
     }

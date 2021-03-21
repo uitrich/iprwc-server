@@ -14,17 +14,18 @@ public class AuthenticationController {
     private SessionController sessionController;
     private static AuthenticationController instance;
 
+
+    static {
+         instance = new AuthenticationController();
+    }
     /**
      * Create a singleton from supercontroller, this controller has access to all other controller and can be called from anywhere.
      * @return
      */
-    public static synchronized AuthenticationController getInstance() {
-        if (instance == null) {
-            instance = new AuthenticationController();
-        }
-
+    public static AuthenticationController getInstance() {
         return instance;
     }
+
     private AuthenticationController() {
         accountController = AccountController.getInstance();
         sessionController = SessionController.getInstance();

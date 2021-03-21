@@ -75,11 +75,15 @@ public class AuthenticationResource
         }
 
         String sessionKey = requestContext.getCookies().get(COOKIE_KEY).getValue();
-        SessionStateResponse state = controller.getSessionState(sessionKey);
-
-        if (state.isValid() && update) {
+        SessionStateResponse state;
+        try {
+            state = controller.getSessionState(sessionKey);
+            if (state.isValid() && update) {
                 controller.updateSession(sessionKey);
                 state = controller.getSessionState(sessionKey);
+            }
+        } catch (NotFoundException e) {
+            return new SessionStateResponse(false);
         }
 
         return state;

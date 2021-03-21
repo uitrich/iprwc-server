@@ -114,4 +114,10 @@ public class ShoppingCartResource {
             return Response.status(Response.Status.OK).entity(controller.getQuantity(userId)).build();
         throw new NotAuthorizedException("You do not have permission to alter another user's account");
     }
+    @POST
+    @Path("/order")
+    public Response updateSales(@Auth User auth) throws InvalidOperationException {
+        return controller.updateSales(controller.getQuantity(auth.getAccount().getId()), auth.getAccount().getId()) ?
+                Response.ok().build() : Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+    }
 }

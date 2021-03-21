@@ -12,16 +12,18 @@ public class CompanyController {
     private CompanyDAO dao;
     private static CompanyController instance;
 
-    public static synchronized CompanyController getInstance() {
-        if (instance == null) {
-            instance = new CompanyController();
-        }
-
-        return instance;
+    static {
+        instance = new CompanyController();
     }
+
     private CompanyController() {
         dao = new CompanyDAO();
     }
+
+    public static CompanyController getInstance() {
+        return instance;
+    }
+
     public List<Company> getAll() throws InvalidOperationException {
         try {
             return dao.getAll();
