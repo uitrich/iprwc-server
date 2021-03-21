@@ -53,8 +53,7 @@ public class AuthenticationResource
     public Response logOut(
             @Context ContainerRequestContext requestContext) throws NotFoundException, InvalidOperationException {
         if (requestContext.getCookies().containsKey(COOKIE_KEY)) {
-            String sessionKey = requestContext.getCookies().get(COOKIE_KEY).getValue();
-            controller.logOut(sessionKey);
+            controller.logOut(requestContext.getCookies().get(COOKIE_KEY).getValue());
 
             return Response
                     .ok()

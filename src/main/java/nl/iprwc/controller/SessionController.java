@@ -28,29 +28,9 @@ public class SessionController {
         return instance;
     }
 
-    public Session fromId(long id) throws NotFoundException, InvalidOperationException {
-        try {
-            Session output = dao.fromId(id);
-            output.setAccount(AccountController.getInstance().get(output.getAccount().getId()));
-            return output;
-        } catch (SQLException | ClassNotFoundException e) {
-            throw new InvalidOperationException(e.getMessage());
-        }
-    }
-
     public Session fromSessionKey(String key) throws NotFoundException, InvalidOperationException {
         try {
             Session output = dao.fromHashedSessionKey(new Sha512().hash(key), key);
-            output.setAccount(AccountController.getInstance().get(output.getAccount().getId()));
-            return output;
-        } catch (SQLException | ClassNotFoundException e) {
-            throw new InvalidOperationException(e.getMessage());
-        }
-    }
-
-    public Session fromHashedSessionKey(String hashedKey) throws NotFoundException, InvalidOperationException {
-        try {
-            Session output = dao.fromHashedSessionKey(hashedKey);
             output.setAccount(AccountController.getInstance().get(output.getAccount().getId()));
             return output;
         } catch (SQLException | ClassNotFoundException e) {
@@ -99,10 +79,6 @@ public class SessionController {
         dao.delete(id);
     }
 
-    /**
-     * Update the last activity so that users can stay logged in.
-     * @param session
-     */
     public void updateLastActivity(Session session)
     {
         updateLastActivity(session.getId());

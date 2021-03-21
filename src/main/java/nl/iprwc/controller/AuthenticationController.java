@@ -34,25 +34,19 @@ public class AuthenticationController {
 
     public Session logIn(CredentialsRequest authentication) throws InvalidOperationException, NotFoundException {
         Account account = accountController.fromMailAddress(authentication.getMailAddress());
-        if (!new BCrypt().verifyHash(authentication.getPassword(), account.getPasswordHash())) {
-            return null;
-        }
-
-        return sessionController.create(account);
+        return new BCrypt().verifyHash(authentication.getPassword(), account.getPasswordHash()) ?
+                sessionController.create(account) : null;
     }
 
     public void logOut(String sessionKey) throws NotFoundException, InvalidOperationException {
-        Session session = sessionController.fromSessionKey(sessionKey);
-        sessionController.delete(session);
+        sessionController.delete(sessionController.fromSessionKey(sessionKey));
     }
 
     public SessionStateResponse getSessionState(String sessionKey) throws NotFoundException, InvalidOperationException {
-        Session session = sessionController.fromSessionKey(sessionKey);
-        return new SessionStateResponse(session);
+        return new SessionStateResponse(sessionController.fromSessionKey(sessionKey));
     }
 
     public void updateSession(String sessionKey) throws NotFoundException, InvalidOperationException {
-        Session session = sessionController.fromSessionKey(sessionKey);
-        sessionController.updateLastActivity(session);
+        sessionController.updateLastActivity(sessionController.fromSessionKey(sessionKey));
     }
 }
