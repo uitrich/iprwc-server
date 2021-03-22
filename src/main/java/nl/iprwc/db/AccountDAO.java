@@ -1,7 +1,7 @@
 package nl.iprwc.db;
 
 import nl.iprwc.Request.AccountRequest;
-import nl.iprwc.db.interfacing.DatabaseAccessObjectCRUD;
+import nl.iprwc.db.abstractions.DatabaseAccessObjectCRUD;
 import nl.iprwc.groups.GroupService;
 import nl.iprwc.model.Account;
 import nl.iprwc.sql.DatabaseService;

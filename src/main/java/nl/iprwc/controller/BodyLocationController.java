@@ -1,6 +1,6 @@
 package nl.iprwc.controller;
 
-import nl.iprwc.controller.interfacing.SimpleCRUDController;
+import nl.iprwc.controller.abstractions.SimpleCRUDController;
 import nl.iprwc.db.BodyLocationDAO;
 import nl.iprwc.exception.InvalidOperationException;
 import nl.iprwc.exception.NotFoundException;

@@ -1,7 +1,7 @@
 package nl.iprwc.controller;
 
 import nl.iprwc.Request.AccountRequest;
-import nl.iprwc.controller.interfacing.SimpleCRUDController;
+import nl.iprwc.controller.abstractions.SimpleCRUDController;
 import nl.iprwc.db.AccountDAO;
 import nl.iprwc.exception.InvalidOperationException;
 import nl.iprwc.groups.GroupService;

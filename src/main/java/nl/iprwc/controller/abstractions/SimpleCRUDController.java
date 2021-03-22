@@ -1,4 +1,4 @@
-package nl.iprwc.controller.interfacing;
+package nl.iprwc.controller.abstractions;
 
 import nl.iprwc.exception.InvalidOperationException;
 import nl.iprwc.exception.NotFoundException;

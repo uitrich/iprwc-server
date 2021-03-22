@@ -15,6 +15,7 @@ import java.sql.SQLException;
 public class SessionController {
     private SessionDAO dao;
     private static SessionController instance;
+    private static Sha512 sha512;
 
     static {
         instance = new SessionController();
@@ -22,6 +23,7 @@ public class SessionController {
 
     private SessionController() {
         dao = new SessionDAO();
+        sha512 = new Sha512();
     }
 
     public static SessionController getInstance() {
@@ -30,7 +32,7 @@ public class SessionController {
 
     public Session fromSessionKey(String key) throws NotFoundException, InvalidOperationException {
         try {
-            Session output = dao.fromHashedSessionKey(new Sha512().hash(key), key);
+            Session output = dao.fromHashedSessionKey(sha512.hash(key), key);
             output.setAccount(AccountController.getInstance().get(output.getAccount().getId()));
             return output;
         } catch (SQLException | ClassNotFoundException e) {
@@ -40,33 +42,18 @@ public class SessionController {
 
     public Session create(Account account)
     {
-        String sessionKey;
-        String sessionHash;
-        long id;
-        Sha512 sha512 = new Sha512();
-        String accountId = account.getId();
+        String sessionKey = Random.randomString(256);
+        String sessionHash = sha512.hash(sessionKey);
         DateTime lastActivity = DateTime.now();
-
-        do {
-            sessionKey = Random.randomString(256);
-            sessionHash = sha512.hash(sessionKey);
-
-            try {
-                id = dao.create(accountId, sessionHash, lastActivity);
-            }
-            catch (ConstraintViolationException e) {
-                continue;
-            }
-            catch (Exception e) {
-                e.printStackTrace();
-                return null;
-            }
-
-            break;
+        try {
+            long id = dao.create(account.getId(), sessionHash, lastActivity);
+            return new Session(id, account, sessionKey, sessionHash, lastActivity);
+        } catch (ConstraintViolationException e) {
+            return create(account);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
         }
-        while (true);
-
-        return new Session(id, account, sessionKey, sessionHash, lastActivity);
     }
 
     public void delete(Session session)

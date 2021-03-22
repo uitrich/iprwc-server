@@ -1,4 +1,4 @@
-package nl.iprwc.db.interfacing;
+package nl.iprwc.db.abstractions;
 
 import nl.iprwc.exception.NotFoundException;
 

@@ -1,6 +1,6 @@
 package nl.iprwc.db;
 
-import nl.iprwc.db.interfacing.DatabaseAccessObjectCRUD;
+import nl.iprwc.db.abstractions.DatabaseAccessObjectCRUD;
 import nl.iprwc.model.BodyLocation;
 import nl.iprwc.sql.DatabaseService;
 
