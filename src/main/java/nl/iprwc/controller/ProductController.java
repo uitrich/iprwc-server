@@ -61,7 +61,7 @@ public class ProductController {
     public Paginated<List<ProductResponse>> getAll(LongParam page, LongParam pageSize, String search, List<Integer> category, List<Integer> company, List<Integer> bodyLocation) throws NotFoundException, InvalidOperationException {
 
         try {
-            return dao.getMultiple(0, 0, company, category, bodyLocation, search,  page, pageSize);
+            return dao.getMultiple(0, 0, company, category, bodyLocation, search.toLowerCase(),  page, pageSize);
         } catch (SQLException | ClassNotFoundException e) {
             e.printStackTrace();
             throw new InvalidOperationException();

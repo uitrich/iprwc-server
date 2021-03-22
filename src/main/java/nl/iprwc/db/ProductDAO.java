@@ -77,7 +77,7 @@ public class ProductDAO {
             if (i < bodyLocation.size() -1) queryContents += "body_location = :body_location" + i + " OR ";
             else queryContents += company.size() != 0 && categories.size() != 0 ? "body_location = :body_location" + i + ") AND (" : "body_location = :body_location" + i + ")";
         }
-        queryContents += !(search == null) ? "name LIKE :search) " : " ";
+        queryContents += !(search == null) ? "lower(name) LIKE :search) " : " ";
         String countContent = queryContents;
         String end = "ORDER BY id LIMIT :pagesize OFFSET :page";
         NamedParameterStatement query = initQuery(initialString, queryContents, end, pageSize, page);
