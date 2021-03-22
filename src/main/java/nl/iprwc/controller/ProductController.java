@@ -72,6 +72,7 @@ public class ProductController {
         try {
             return dao.update(product);
         } catch (SQLException | ClassNotFoundException e) {
+            e.printStackTrace();
             throw new InvalidOperationException();
         }
     }
