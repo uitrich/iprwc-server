@@ -109,6 +109,7 @@ public class ShoppingCartResource {
         return Response.status(Response.Status.OK).entity(controller.getQuantity(userId)).build();
     }
     @POST
+    @RolesAllowed("Role_Customer")
     @Path("/order")
     public Response updateSales(@Auth User auth) throws InvalidOperationException {
         return controller.updateSales(controller.getQuantity(auth.getAccount().getId()), auth.getAccount().getId()) ?
