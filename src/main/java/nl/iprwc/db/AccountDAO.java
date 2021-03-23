@@ -75,15 +75,14 @@ public class AccountDAO implements DatabaseAccessObjectCRUD<Account, String, Acc
     public String create(AccountRequest creationRequest) throws SQLException, ClassNotFoundException {
         NamedParameterStatement statement = DatabaseService.getInstance()
                 .createNamedPreparedStatement("INSERT INTO public.account "
-                        + "(id, firstname, lastname, mailaddress, password, postal_code, house_number, reference) VALUES "
-                        + "(:id, :firstname, :lastname, :mailaddress, :password, :postal_code, :house_number, :reference);");
+                        + "(id, firstname, lastname, mailaddress, password, postal_code, house_number) VALUES "
+                        + "(:id, :firstname, :lastname, :mailaddress, :password, :postal_code, :house_number);");
         statement.setString("id", UUID.randomUUID().toString());
         statement.setString("firstname", creationRequest.getFirstName());
         statement.setString("lastname", creationRequest.getLastName());
         statement.setString("postal_code", creationRequest.getPostalCode());
         statement.setString("house_number", creationRequest.getHouseNumber());
         statement.setString("password", creationRequest.getPassword());
-        statement.setString("reference", "Role_Customer");
         statement.setString("mailaddress", creationRequest.getMailAddress());
 
 
@@ -136,8 +135,7 @@ public class AccountDAO implements DatabaseAccessObjectCRUD<Account, String, Acc
                     result.getString("mailaddress"),
                     result.getString("postal_code"),
                     result.getString("house_number"),
-                    result.getString("password"),
-                    result.getString("reference")
+                    result.getString("password")
             );
             account.setGroups(GroupService.getInstance().getGroups(account));
             return account;

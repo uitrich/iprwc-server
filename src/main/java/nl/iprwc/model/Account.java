@@ -19,7 +19,6 @@ public class Account {
     private String postalCode;
     private String houseNumber;
     private List<Group> groups;
-    private String reference;
 
     public Account() {
         this.id = UUID.randomUUID().toString();
@@ -30,10 +29,9 @@ public class Account {
         this.postalCode = null;
         this.houseNumber = null;
         this.groups = new ArrayList<>();
-        this.reference = "";
     }
 
-    public Account(String id, String firstName, String lastName, String mailAddress, String postalCode, String houseNumber, String passwordHash, String reference) {
+    public Account(String id, String firstName, String lastName, String mailAddress, String postalCode, String houseNumber, String passwordHash) {
 
         this.id = id;
         this.firstName = firstName;
@@ -41,7 +39,6 @@ public class Account {
         this.mailAddress = mailAddress.toLowerCase();
         this.passwordHash = passwordHash;
         this.groups = new ArrayList<>();
-        this.reference = reference;
         this.postalCode = postalCode;
         this.houseNumber = houseNumber;
     }
@@ -61,7 +58,6 @@ public class Account {
         this.mailAddress = mailAddress.toLowerCase();
         this.passwordHash = passwordHash;
         this.groups = new ArrayList<Group>();
-        this.reference = "";
         this.houseNumber = "1a";
         this.postalCode = "1234";
     }
@@ -118,9 +114,6 @@ public class Account {
         }
         if(newAccount.getPasswordHash() != null){
             this.passwordHash = newAccount.getPasswordHash();
-        }
-        if(newAccount.getReference() != null){
-            this.reference = newAccount.getReference();
         }
         return this;
     }
@@ -186,16 +179,6 @@ public class Account {
     @JsonIgnore
     public void setPasswordHash(String passwordHash) {
         this.passwordHash = passwordHash;
-    }
-
-    @JsonProperty
-    public String getReference() {
-        return reference;
-    }
-
-    @JsonIgnore
-    public void setReference(String reference) {
-        this.reference = reference;
     }
 
     @JsonProperty
