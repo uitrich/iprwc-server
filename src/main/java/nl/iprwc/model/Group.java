@@ -1,9 +1,7 @@
 package nl.iprwc.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonView;
 import nl.iprwc.groups.RawGroup;
-import nl.iprwc.view.View;
 
 public class Group {
     private long id;
@@ -41,37 +39,31 @@ public class Group {
     }
 
     @JsonProperty
-    @JsonView(View.Private.class)
     public long getId() {
         return id;
     }
 
     @JsonProperty
-    @JsonView(View.Private.class)
     public String getName() {
         return name;
     }
 
     @JsonProperty
-    @JsonView(View.All.class)
     public boolean isSystem() {
         return system;
     }
 
     @JsonProperty
-    @JsonView(View.All.class)
     public String getInternalReference() {
         return internalReference;
     }
 
     @JsonProperty
-    @JsonView(View.All.class)
     public boolean isEditable() {
         return editable;
     }
 
     @JsonProperty
-    @JsonView(View.All.class)
     public Group[] getGroups() {
         return groups;
     }

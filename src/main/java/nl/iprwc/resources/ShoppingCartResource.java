@@ -11,7 +11,6 @@ import nl.iprwc.exception.NotFoundException;
 import nl.iprwc.model.Account;
 import nl.iprwc.model.Authentication;
 import nl.iprwc.model.User;
-import nl.iprwc.view.View;
 
 import javax.annotation.security.RolesAllowed;
 import javax.persistence.PostUpdate;
@@ -30,7 +29,6 @@ public class ShoppingCartResource {
     }
 
     @GET
-    @JsonView(View.Public.class)
     @RolesAllowed("Role_Customer")
     public Response getCartContents(@Auth User user) throws NotFoundException, InvalidOperationException {
         return Response.status(Response.Status.OK).entity(controller.getShoppingcart(user.getAccount().getId())).build();
@@ -38,14 +36,12 @@ public class ShoppingCartResource {
     @GET
     @Path("/admin/{id}")
     @RolesAllowed("Role_Admin")
-    @JsonView(View.Public.class)
     public Response getCartContents(@PathParam("id") String accountId) throws NotFoundException, InvalidOperationException {
         return Response.status(Response.Status.OK).entity(controller.getShoppingcart(accountId)).build();
     }
 
     @POST
     @Path("/{productId}")
-    @JsonView(View.Public.class)
     @RolesAllowed("Role_Customer")
     public Response addCartItem(@PathParam("productId") long productId, @Auth User user) throws NotFoundException, InvalidOperationException {
         controller.addItem(productId, user.getAccount().getId());
@@ -54,7 +50,6 @@ public class ShoppingCartResource {
 
     @POST
     @Path("/admin/{id}/{user}")
-    @JsonView(View.Public.class)
     @RolesAllowed("Role_Admin")
     public Response addCartItem(@PathParam("id") long id, @PathParam("user") String user) throws NotFoundException, InvalidOperationException {
         controller.addItem(id, user);
@@ -108,11 +103,10 @@ public class ShoppingCartResource {
         return Response.status(Response.Status.OK).entity(controller.getQuantity(user.getAccount().getId())).build();
     }
     @POST
+    @RolesAllowed("Role_Admin")
     @Path("/admin/quantity/{id}")
     public Response getQuantity(@Auth User auth, String userId) throws InvalidOperationException {
-        if (auth.getAccount().getId() == userId || auth.hasGroupReference("Role_Admin"))
-            return Response.status(Response.Status.OK).entity(controller.getQuantity(userId)).build();
-        throw new NotAuthorizedException("You do not have permission to alter another user's account");
+        return Response.status(Response.Status.OK).entity(controller.getQuantity(userId)).build();
     }
     @POST
     @Path("/order")

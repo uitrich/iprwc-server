@@ -12,7 +12,6 @@ import nl.iprwc.exception.NotFoundException;
 import nl.iprwc.model.Account;
 import nl.iprwc.model.Authentication;
 import nl.iprwc.model.User;
-import nl.iprwc.view.View;
 
 import javax.annotation.security.RolesAllowed;
 import javax.validation.Valid;

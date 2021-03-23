@@ -2,8 +2,6 @@ package nl.iprwc.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonView;
-import nl.iprwc.view.View;
 
 import javax.persistence.Entity;
 import javax.persistence.Table;
@@ -137,13 +135,11 @@ public class Account {
     }
 
     @JsonProperty
-    @JsonView(View.Private.class)
     public List<Group> getGroups(){
         return this.groups;
     }
 
     @JsonProperty
-    @JsonView(View.Public.class)
     public String getId() {
         return id;
     }
@@ -153,7 +149,6 @@ public class Account {
         this.id = id;
     }
 
-    @JsonView(View.Public.class)
     @JsonProperty
     public String getFirstName() {
         return firstName;
@@ -163,7 +158,6 @@ public class Account {
         this.firstName = firstName;
     }
 
-    @JsonView(View.Public.class)
     @JsonProperty
     public String getLastName() {
         return lastName;
@@ -175,7 +169,6 @@ public class Account {
     }
 
     @JsonProperty
-    @JsonView(View.Private.class)
     public String getMailAddress() {
         return mailAddress;
     }
@@ -196,7 +189,6 @@ public class Account {
     }
 
     @JsonProperty
-    @JsonView(View.Private.class)
     public String getReference() {
         return reference;
     }
@@ -206,7 +198,6 @@ public class Account {
         this.reference = reference;
     }
 
-    @JsonView(View.Public.class)
     @JsonProperty
     public String getPostalCode() {
         return postalCode;
@@ -215,7 +206,6 @@ public class Account {
     public void setPostalCode(String postalCode) {
         this.postalCode = postalCode;
     }
-    @JsonView(View.Public.class)
     @JsonProperty
     public String getHouseNumber() {
         return houseNumber;
