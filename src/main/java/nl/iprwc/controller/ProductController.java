@@ -14,6 +14,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class ProductController {
@@ -41,18 +42,15 @@ public class ProductController {
         }
     }
 
-    public Object getImageFromId(long id) throws InvalidOperationException {
-        String image = null;
+    public String getImageFromId(long id) throws InvalidOperationException {
         try {
-            image = dao.getImage(id);
-            boolean isUrl;
+            String image = dao.getImage(id);
             try {
                 new URL(image);
-                return BaseImageTranslator.getByteArrayFromImageURL(image);
+                return BaseImageTranslator.getBase64URL(image);
             } catch (MalformedURLException e) {
-                isUrl = false;
+                return BaseImageTranslator.convert(image);
             }
-            return BaseImageTranslator.convert(image, isUrl);
         } catch (SQLException | ClassNotFoundException | IOException e) {
             throw new InvalidOperationException();
         }
@@ -92,7 +90,7 @@ public class ProductController {
             new URL(image);
             product.setImage(BaseImageTranslator.getBase64URL(image));
         } catch (IOException ignored) {
-            //ignore
+            product.setImage(BaseImageTranslator.convert(image));
         }
         if (product.getCategory() == 0 ) System.out.println("category has 0, aborting..");
         else if (product.getCompany() == 0 ) System.out.println("company has 0, aborting..");

@@ -1,5 +1,7 @@
 package nl.iprwc.utils;
 
+import nl.iprwc.exception.InvalidOperationException;
+
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -7,103 +9,41 @@ import java.io.*;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.Base64;
+import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.stream.Collectors;
 
 public class BaseImageTranslator {
-    private static BaseImageTranslator instance;
-
-    static {
-        instance = new BaseImageTranslator();
-    }
-    public static BaseImageTranslator getInstance() {
-        return instance;
-    }
-
-    private static final int WORKER_THREADS = 2;
-
-    private Thread[] workers = new Thread[WORKER_THREADS];
-    private Queue<String> queue = new ConcurrentLinkedQueue<>();
-
-    private BaseImageTranslator() {
-        for (int i = 0; i < WORKER_THREADS; i++) {
-            workers[i] = new Worker();
-            workers[i].start();
-        }
-    }
-
-    @Override
-    protected void finalize() throws Throwable {
-        try {
-            Worker.stopWorkers = true;
-        } finally {
-            super.finalize();
-        }
-    }
-
-    private static class Worker extends Thread {
-        static boolean stopWorkers = false;
-
-        @Override
-        public void run() {
-            try {
-                nextFile();
-            } catch (InterruptedException e) {
-
-                e.printStackTrace();
-            }
-        }
-
-        private void nextFile() throws InterruptedException {
-            String queueItem;
-            do {
-                queueItem = BaseImageTranslator.getInstance().queue.poll();
-                if (null == queueItem){
-                    sleep(250);
-                } else{
-                    convert(queueItem, false);
-                }
-            } while (!stopWorkers);
-
-            if (stopWorkers) {
-                return;
-            }
-
-
-        }
-
-    }
-    public static File convert(String baseImage, boolean url) {
+    public static String convert(String baseImage) {
         try{
             // tokenize the data
             String base64Image;
-            if (!url) base64Image = baseImage.split(",")[1];
-            else base64Image = baseImage;
+            base64Image = baseImage.split(",")[1];
             byte[] imageByte = javax.xml.bind.DatatypeConverter.parseBase64Binary(base64Image);
 
             // create a buffered image
-            BufferedImage image = null;
-
-            imageByte = Base64.getDecoder().decode(base64Image);
+            BufferedImage image;
             ByteArrayInputStream bis = new ByteArrayInputStream(imageByte);
             image = ImageIO.read(bis);
             bis.close();
 
-            image = ImageTransparancy.imageToBufferedImage(ImageTransparancy.makeColorTransparent(image, new Color(Color.white.getRGB())));
-            image = ImageTransparancy.imageToBufferedImage(ImageTransparancy.makeColorTransparent(image, new Color(Color.lightGray.getRGB())));
+            BufferedImage source = (BufferedImage) image;
+            image = ImageTransparancy.imageToBufferedImage(
+                    ImageTransparancy.makeColorTransparent(source, Color.white, 0.5f)
+            );
 
             // write the image to a file
-            File outputfile = new File("image.png");
+            ByteArrayOutputStream outputfile = new ByteArrayOutputStream();
             ImageIO.write(image, "png", outputfile);
-            return outputfile;
+            String result = "data:image/png;base64," + Base64.getEncoder().encodeToString(outputfile.toByteArray());
+
+            return result;
         }
         catch(Exception e) {
             e.printStackTrace();
         }
         return null;
-    }
-    public static File getByteArrayFromImageURL(String url) throws IOException {
-        return convert(getBase64URL(url), false);
     }
 
     public static String getBase64URL(String url) throws IOException {

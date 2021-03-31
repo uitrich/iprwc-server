@@ -33,7 +33,7 @@ public class ProductResponse {
                 CategoryController.getInstance().get(p.getCategory()),
                 CompanyController.getInstance().get(p.getCompany()),
                 p.getId(),
-                p.getImage());
+                BaseImageTranslator.convert(p.getImage()));
     }
 
     public ProductResponse(String name, double price, BodyLocation bodyLocation, Category category, Company company, long id, String image) {

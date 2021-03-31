@@ -66,6 +66,7 @@ public class ProductResource {
     public Response getImageFromId(@PathParam("id") long id) throws InvalidOperationException {
             return Response.status(Response.Status.OK).entity(controller.getImageFromId(id)).build();
     }
+
     @GET
     @Path("/top/{range}")
     @Produces(MediaType.APPLICATION_JSON)

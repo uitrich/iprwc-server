@@ -78,20 +78,14 @@ public class ProductDAO {
             else queryContents += company.size() != 0 && categories.size() != 0 ? "body_location = :body_location" + i + ") AND (" : "body_location = :body_location" + i + ")";
         }
         queryContents += !(search == null) ? "lower(name) LIKE :search) " : " ";
-        String countContent = queryContents;
         String end = "ORDER BY id LIMIT :pagesize OFFSET :page";
+
         NamedParameterStatement query = initQuery(initialString, queryContents, end, pageSize, page);
         query = populatePreparedStatementWithFilters(query, search, categories, company, bodyLocation);
         List<Product> result = fromResultSets(query.executeQuery());
 
-        NamedParameterStatement counter = initQuery("SELECT COUNT(*) AS count FROM product ", queryContents, "", pageSize, page);
-        counter = populatePreparedStatementWithFilters(counter, search, categories, company, bodyLocation);
-        ResultSet countResult = counter.executeQuery();
-
-        countResult.next();
-        long count = countResult.getLong("count");
         List<ProductResponse> populatedResult = ProductController.getInstance().populateProductList(result);
-        return new Paginated<>(pageSize.get(), page.get(), count, populatedResult);
+        return new Paginated<>(pageSize.get(), page.get(), result.size(), populatedResult);
 
     }
 
@@ -99,11 +93,11 @@ public class ProductDAO {
         NamedParameterStatement statement =  DatabaseService
                 .getInstance()
                 .createNamedPreparedStatement(initialString + queryContents + end);
-        long getPagesize = pageSize.get();
-        if (getPagesize != 0 && end != "") {
+        long pageSizePrimitive = pageSize.get();
+        if (pageSizePrimitive != 0 && end != "") {
                 statement
-                    .setParameter("pagesize", getPagesize)
-                    .setParameter("page", (page.get() -1) * pageSize.get());
+                    .setParameter("pagesize", pageSizePrimitive)
+                    .setParameter("page", (page.get() -1) * pageSizePrimitive);
         }
         return statement;
     }

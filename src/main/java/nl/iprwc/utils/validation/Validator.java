@@ -5,6 +5,10 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/**
+ * This is a class that was used in the LMDS project, which i worked on later than when this website was developed.
+ * Technically speaking this class can cease to exist without much functionality being lost
+ */
 public class Validator {
     private List<ValidatorFunction> validators;
 

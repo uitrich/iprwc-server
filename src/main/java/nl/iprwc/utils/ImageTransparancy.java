@@ -34,28 +34,20 @@ public class ImageTransparancy
         g2.dispose();
         return bufferedImage;
     }
-
-    /**
-     * Make provided image transparent wherever color matches the provided color.
-     *
-     * @param im BufferedImage whose color will be made transparent.
-     * @param color Color in provided image which will be made transparent.
-     * @return Image with transparency applied.
-     */
-    public static Image makeColorTransparent(final BufferedImage im, final Color color)
-    {
-        final ImageFilter filter = new RGBImageFilter()
-        {
-            // the color we are looking for (white)... Alpha bits are set to opaque
-            public int markerRGB = color.getRGB() | 0xFFFFFFFF;
-
-            public final int filterRGB(final int x, final int y, final int rgb)
-            {
-                return (rgb | 0xFF000000) == markerRGB ? 0x00FFFFFF & rgb : rgb;
+    public static Image makeColorTransparent(BufferedImage im, final Color color, float threshold) {
+        ImageFilter filter = new RGBImageFilter() {
+            public float markerAlpha = color.getRGB() | 0xFF000000;
+            public final int filterRGB(int x, int y, int rgb) {
+                int currentAlpha = rgb | 0xFF000000;           // just to make it clear, stored the value in new variable
+                float diff = Math.abs((currentAlpha - markerAlpha) / markerAlpha);  // Now get the difference
+                if (diff <= threshold) {                      // Then compare that threshold value
+                    return 0x00FFFFFF & rgb;
+                } else {
+                    return rgb;
+                }
             }
         };
-
-        final ImageProducer ip = new FilteredImageSource(im.getSource(), filter);
+        ImageProducer ip = new FilteredImageSource(im.getSource(), filter);
         return Toolkit.getDefaultToolkit().createImage(ip);
     }
 }
