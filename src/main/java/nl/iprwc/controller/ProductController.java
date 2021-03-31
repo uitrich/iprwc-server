@@ -153,15 +153,7 @@ public class ProductController {
         List<ProductResponse> result = new ArrayList<>();
         for (Product product : products) {
             result.add(
-                    new ProductResponse(
-                            product.getName(),
-                            product.getPrice(),
-                            BodyLocationController.getInstance().get(product.getBodyLocation()),
-                            CategoryController.getInstance().get(product.getCategory()),
-                            CompanyController.getInstance().get(product.getCompany()),
-                            product.getId(),
-                            product.getImage()
-                    )
+                    ProductResponse.CreateFromProduct(product)
             );
         }
         return result;
