@@ -4,11 +4,12 @@ import nl.iprwc.Request.AccountRequest;
 import nl.iprwc.controller.abstractions.SimpleCRUDController;
 import nl.iprwc.db.AccountDAO;
 import nl.iprwc.exception.InvalidOperationException;
+import nl.iprwc.exception.NotFoundException;
 import nl.iprwc.groups.GroupService;
 import nl.iprwc.hash.BCrypt;
-import nl.iprwc.model.*;
+import nl.iprwc.model.Account;
+import nl.iprwc.model.Authentication;
 
-import nl.iprwc.exception.NotFoundException;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.UUID;

@@ -1,23 +1,15 @@
 package nl.iprwc.resources;
 
-import com.fasterxml.jackson.annotation.JsonView;
-import com.sun.media.sound.InvalidDataException;
 import io.dropwizard.auth.Auth;
-import nl.iprwc.controller.AccountController;
-import nl.iprwc.controller.GroupController;
 import nl.iprwc.controller.ShoppingCartController;
 import nl.iprwc.exception.InvalidOperationException;
 import nl.iprwc.exception.NotFoundException;
-import nl.iprwc.model.Account;
-import nl.iprwc.model.Authentication;
 import nl.iprwc.model.User;
 
 import javax.annotation.security.RolesAllowed;
-import javax.persistence.PostUpdate;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import java.sql.SQLException;
 
 @Path("api/shoppingcart")
 @Produces(MediaType.APPLICATION_JSON)

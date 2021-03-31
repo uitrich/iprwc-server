@@ -28,9 +28,8 @@ public class BaseImageTranslator {
             image = ImageIO.read(bis);
             bis.close();
 
-            BufferedImage source = (BufferedImage) image;
             image = ImageTransparancy.imageToBufferedImage(
-                    ImageTransparancy.makeColorTransparent(source, Color.white, 0.5f)
+                    ImageTransparancy.makeColorTransparent(image, Color.white)
             );
 
             // write the image to a file

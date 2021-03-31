@@ -4,9 +4,6 @@ import nl.iprwc.Response.ProductResponse;
 import nl.iprwc.db.ShoppingCartDAO;
 import nl.iprwc.exception.InvalidOperationException;
 import nl.iprwc.exception.NotFoundException;
-import nl.iprwc.model.Product;
-import nl.iprwc.model.User;
-import nl.iprwc.sql.DatabaseService;
 
 import java.sql.SQLException;
 import java.util.List;

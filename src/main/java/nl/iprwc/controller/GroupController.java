@@ -5,7 +5,6 @@ import nl.iprwc.exception.InvalidOperationException;
 import nl.iprwc.exception.NotFoundException;
 import nl.iprwc.model.Account;
 import nl.iprwc.model.Group;
-import nl.iprwc.model.User;
 
 import java.sql.SQLException;
 

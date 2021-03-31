@@ -2,19 +2,18 @@ package nl.iprwc.controller;
 
 import io.dropwizard.jersey.params.LongParam;
 import nl.iprwc.Response.ProductResponse;
-import nl.iprwc.utils.BaseImageTranslator;
-import nl.iprwc.utils.Paginated;
 import nl.iprwc.db.ProductDAO;
 import nl.iprwc.exception.InvalidOperationException;
 import nl.iprwc.exception.NotFoundException;
 import nl.iprwc.model.Product;
+import nl.iprwc.utils.BaseImageTranslator;
+import nl.iprwc.utils.Paginated;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class ProductController {

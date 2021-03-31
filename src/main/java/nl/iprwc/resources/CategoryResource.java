@@ -1,7 +1,7 @@
 package nl.iprwc.resources;
 
 
-import nl.iprwc.controller.*;
+import nl.iprwc.controller.CategoryController;
 import nl.iprwc.exception.InvalidOperationException;
 import nl.iprwc.exception.NotFoundException;
 import nl.iprwc.model.Category;

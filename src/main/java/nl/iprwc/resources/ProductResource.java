@@ -13,7 +13,8 @@ import javax.annotation.security.RolesAllowed;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.ws.rs.*;
-import javax.ws.rs.core.*;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -35,7 +36,7 @@ public class ProductResource {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public Response getAllProductsFiltered(@QueryParam("page")            @DefaultValue("1")  @Min(1) LongParam page,
-                                           @QueryParam("page-size")       @DefaultValue("12") @Min(1) @Max(100) LongParam       pageSize,
+                                           @QueryParam("page-size")       @DefaultValue("12") @Min(1) @Max(100) LongParam     pageSize,
                                            @QueryParam("category")                                              List<Integer> category,
                                            @QueryParam("company")                                               List<Integer> company,
                                            @QueryParam("bodyLocation")                                          List<Integer> bodyLocation,

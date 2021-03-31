@@ -1,12 +1,12 @@
 package nl.iprwc.controller;
 
-import nl.iprwc.utils.Random;
 import nl.iprwc.db.SessionDAO;
 import nl.iprwc.exception.InvalidOperationException;
 import nl.iprwc.exception.NotFoundException;
 import nl.iprwc.hash.Sha512;
 import nl.iprwc.model.Account;
 import nl.iprwc.model.Session;
+import nl.iprwc.utils.Random;
 import org.hibernate.exception.ConstraintViolationException;
 import org.joda.time.DateTime;
 

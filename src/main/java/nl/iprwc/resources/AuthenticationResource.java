@@ -2,20 +2,22 @@ package nl.iprwc.resources;
 
 import io.dropwizard.hibernate.UnitOfWork;
 import nl.iprwc.Request.CredentialsRequest;
+import nl.iprwc.Response.SessionStateResponse;
+import nl.iprwc.Response.SuccessResponse;
 import nl.iprwc.controller.AuthenticationController;
 import nl.iprwc.exception.InvalidOperationException;
 import nl.iprwc.exception.NotFoundException;
 import nl.iprwc.model.Session;
-import nl.iprwc.Response.SessionStateResponse;
 import nl.iprwc.utils.KillCookie;
-import nl.iprwc.Response.SuccessResponse;
 import nl.iprwc.utils.SetCookie;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.ws.rs.*;
 import javax.ws.rs.container.ContainerRequestContext;
-import javax.ws.rs.core.*;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 
 @Path("/api/authentication")
 public class AuthenticationResource

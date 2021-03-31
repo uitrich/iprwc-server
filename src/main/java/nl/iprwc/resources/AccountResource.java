@@ -1,9 +1,6 @@
 package nl.iprwc.resources;
 
 
-import com.fasterxml.jackson.annotation.JsonView;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.sun.media.sound.InvalidDataException;
 import io.dropwizard.auth.Auth;
 import nl.iprwc.Request.AccountRequest;
 import nl.iprwc.controller.AccountController;
@@ -19,9 +16,6 @@ import javax.validation.constraints.NotNull;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import java.io.IOException;
-import java.sql.SQLException;
-import java.util.UUID;
 
 @Path("/api/account")
 @Produces(MediaType.APPLICATION_JSON)
